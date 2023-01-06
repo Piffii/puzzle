@@ -37,6 +37,10 @@ right_view_sprites = pygame.sprite.Group()
 rules_screen_sprites = pygame.sprite.Group()
 select_level_sprites = pygame.sprite.Group()
 arrows_sprites = pygame.sprite.Group()
+theatre_front_sprites = pygame.sprite.Group()
+theatre_left_sprites = pygame.sprite.Group()
+theatre_right_sprites = pygame.sprite.Group()
+theatre_back_sprites = pygame.sprite.Group()
 
 
 start_button = pygame.sprite.Sprite(start_screen_sprites)
@@ -62,10 +66,9 @@ rules_button.rect.y = (HEIGHT / 2 + HEIGHT / 6) - HEIGHT / 18
 
 left_arrow = pygame.sprite.Sprite(arrows_sprites)
 left_arrow.image = load_image("left_arrow.png")
-left_arrow.image = pygame.transform.scale(left_arrow.image, (WIDTH / 3, HEIGHT / 3))
 left_arrow.rect = left_arrow.image.get_rect()
-left_arrow.rect.x = 10
-left_arrow.rect.y = HEIGHT - HEIGHT / 3
+left_arrow.rect.x = WIDTH / 20
+left_arrow.rect.y = HEIGHT - HEIGHT / 10
 
 theatre_button = pygame.sprite.Sprite(select_level_sprites)
 theatre_button.image = load_image("theatre_button.png")
@@ -73,6 +76,34 @@ theatre_button.image = pygame.transform.scale(theatre_button.image, (WIDTH / 2, 
 theatre_button.rect = theatre_button.image.get_rect()
 theatre_button.rect.x = WIDTH / 6
 theatre_button.rect.y = HEIGHT / 2 - HEIGHT / 6
+
+theatre_front_box = pygame.sprite.Sprite(theatre_front_sprites)
+theatre_front_box.image = load_image("theatre_front_box.png")
+theatre_front_box.image = pygame.transform.scale(theatre_front_box.image, (WIDTH, HEIGHT))
+theatre_front_box.rect = theatre_front_box.image.get_rect()
+theatre_front_box.rect.x = 0
+theatre_front_box.rect.y = 0
+
+theatre_front_door = pygame.sprite.Sprite(theatre_front_sprites)
+theatre_front_door.image = load_image("theatre_front_door.png")
+theatre_front_door.image = pygame.transform.scale(theatre_front_door.image, (WIDTH, HEIGHT))
+theatre_front_door.rect = theatre_front_door.image.get_rect()
+theatre_front_door.rect.x = 0
+theatre_front_door.rect.y = 0
+
+theatre_front_hanger = pygame.sprite.Sprite(theatre_front_sprites)
+theatre_front_hanger.image = load_image("theatre_front_hanger.png")
+theatre_front_hanger.image = pygame.transform.scale(theatre_front_hanger.image, (WIDTH, HEIGHT))
+theatre_front_hanger.rect = theatre_front_hanger.image.get_rect()
+theatre_front_hanger.rect.x = 0
+theatre_front_hanger.rect.y = 0
+
+theatre_front_noteboard = pygame.sprite.Sprite(theatre_front_sprites)
+theatre_front_noteboard.image = load_image("theatre_front_noteboard.png")
+theatre_front_noteboard.image = pygame.transform.scale(theatre_front_noteboard.image, (WIDTH, HEIGHT))
+theatre_front_noteboard.rect = theatre_front_noteboard.image.get_rect()
+theatre_front_noteboard.rect.x = 0
+theatre_front_noteboard.rect.y = 0
 
 
 def terminate():
@@ -98,19 +129,8 @@ def start_screen():
 
 
 def select_level():
-    fon = pygame.transform.scale(load_image('start_screen.png'), (WIDTH, HEIGHT))
+    fon = pygame.transform.scale(load_image('level_select.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
-    select_level_text = ["Выбор уровня:"]
-    font = pygame.font.Font(None, 60)
-    text_coord = HEIGHT / 4
-    for line in select_level_text:
-        string_rendered = font.render(line, True, pygame.Color('black'))
-        rules_rect = string_rendered.get_rect()
-        text_coord += 10
-        rules_rect.top = text_coord
-        rules_rect.x = WIDTH / 4
-        text_coord += rules_rect.height
-        screen.blit(string_rendered, rules_rect)
     select_level_sprites.draw(screen)
     arrows_sprites.draw(screen)
     while True:
@@ -153,13 +173,13 @@ def show_rules():
 
 
 start_screen()
-screen.fill((123, 231, 213))
+screen.blit(pygame.transform.scale(load_image('theatre_front.png'), (WIDTH, HEIGHT)), (0, 0))
+theatre_front_sprites.draw(screen)
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    screen.fill((123, 231, 213))
     all_sprites.draw(screen)
     clock.tick(FPS)
     pygame.display.flip()
