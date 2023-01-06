@@ -37,6 +37,7 @@ right_view_sprites = pygame.sprite.Group()
 rules_screen_sprites = pygame.sprite.Group()
 select_level_sprites = pygame.sprite.Group()
 arrows_sprites = pygame.sprite.Group()
+arrow_sprites = pygame.sprite.Group()
 theatre_front_sprites = pygame.sprite.Group()
 theatre_left_sprites = pygame.sprite.Group()
 theatre_right_sprites = pygame.sprite.Group()
@@ -64,11 +65,19 @@ rules_button.rect = rules_button.image.get_rect()
 rules_button.rect.x = WIDTH / 2 - WIDTH / 8
 rules_button.rect.y = (HEIGHT / 2 + HEIGHT / 6) - HEIGHT / 18
 
+# левая стрелка
 left_arrow = pygame.sprite.Sprite(arrows_sprites)
 left_arrow.image = load_image("left_arrow.png")
 left_arrow.rect = left_arrow.image.get_rect()
-left_arrow.rect.x = WIDTH / 20
+left_arrow.rect.x = WIDTH / 35
 left_arrow.rect.y = HEIGHT - HEIGHT / 10
+
+# правая стрелка
+right_arrow = pygame.sprite.Sprite(arrow_sprites)
+right_arrow.image = load_image("right_arrow.png")
+right_arrow.rect = right_arrow.image.get_rect()
+right_arrow.rect.x = WIDTH / 1.08
+right_arrow.rect.y = HEIGHT - HEIGHT / 10
 
 theatre_button = pygame.sprite.Sprite(select_level_sprites)
 theatre_button.image = load_image("theatre_button.png")
@@ -77,6 +86,7 @@ theatre_button.rect = theatre_button.image.get_rect()
 theatre_button.rect.x = WIDTH / 6
 theatre_button.rect.y = HEIGHT / 2 - HEIGHT / 6
 
+# передняя часть
 theatre_front_box = pygame.sprite.Sprite(theatre_front_sprites)
 theatre_front_box.image = load_image("theatre_front_box.png")
 theatre_front_box.image = pygame.transform.scale(theatre_front_box.image, (WIDTH, HEIGHT))
@@ -104,6 +114,35 @@ theatre_front_noteboard.image = pygame.transform.scale(theatre_front_noteboard.i
 theatre_front_noteboard.rect = theatre_front_noteboard.image.get_rect()
 theatre_front_noteboard.rect.x = 0
 theatre_front_noteboard.rect.y = 0
+
+# левая часть
+theatre_left_box = pygame.sprite.Sprite(theatre_left_sprites)
+theatre_left_box.image = load_image("theatre_left_box.png")
+theatre_left_box.image = pygame.transform.scale(theatre_left_box.image, (WIDTH, HEIGHT))
+theatre_left_box.rect = theatre_left_box.image.get_rect()
+theatre_left_box.rect.x = 0
+theatre_left_box.rect.y = 0
+
+theatre_front_door = pygame.sprite.Sprite(theatre_left_sprites)
+theatre_front_door.image = load_image("theatre_left_door.png")
+theatre_front_door.image = pygame.transform.scale(theatre_front_door.image, (WIDTH, HEIGHT))
+theatre_front_door.rect = theatre_front_door.image.get_rect()
+theatre_front_door.rect.x = 0
+theatre_front_door.rect.y = 0
+
+theatre_left_sprout = pygame.sprite.Sprite(theatre_left_sprites)
+theatre_left_sprout.image = load_image("theatre_left_sprout.png")
+theatre_left_sprout.image = pygame.transform.scale(theatre_left_sprout.image, (WIDTH, HEIGHT))
+theatre_left_sprout.rect = theatre_left_sprout.image.get_rect()
+theatre_left_sprout.rect.x = 0
+theatre_left_sprout.rect.y = 0
+
+theatre_left_clockface = pygame.sprite.Sprite(theatre_left_sprites)
+theatre_left_clockface.image = load_image("theatre_left_clockface.png")
+theatre_left_clockface.image = pygame.transform.scale(theatre_left_clockface.image, (WIDTH, HEIGHT))
+theatre_left_clockface.rect = theatre_left_clockface.image.get_rect()
+theatre_left_clockface.rect.x = 0
+theatre_left_clockface.rect.y = 0
 
 
 def terminate():
@@ -159,14 +198,37 @@ def show_rules():
                     return start_screen()
 
 
+def teatre_left():
+    fon = pygame.transform.scale(load_image('theatre_left.png'), (WIDTH, HEIGHT))
+    screen.blit(fon, (0, 0))
+    theatre_left_sprites.draw(screen)
+    arrows_sprites.draw(screen)
+    arrow_sprites.draw(screen)
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if left_arrow.rect.collidepoint(event.pos):
+                    return
+                elif right_arrow.rect.collidepoint(event.pos):
+                    return
+
+
 start_screen()
 screen.blit(pygame.transform.scale(load_image('theatre_front.png'), (WIDTH, HEIGHT)), (0, 0))
 theatre_front_sprites.draw(screen)
+arrows_sprites.draw(screen)
+arrow_sprites.draw(screen)
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if left_arrow.rect.collidepoint(event.pos):
+                teatre_left()
     all_sprites.draw(screen)
     clock.tick(FPS)
     pygame.display.flip()
