@@ -148,19 +148,6 @@ def select_level():
 def show_rules():
     fon = pygame.transform.scale(load_image('rules_screen.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
-    rules_text = ["Правила игры",
-                  "Если в правилах несколько строк,",
-                  "приходится выводить их построчно"]
-    font = pygame.font.Font(None, 30)
-    text_coord = 400
-    for line in rules_text:
-        string_rendered = font.render(line, True, pygame.Color('black'))
-        rules_rect = string_rendered.get_rect()
-        text_coord += 10
-        rules_rect.top = text_coord
-        rules_rect.x = 200
-        text_coord += rules_rect.height
-        screen.blit(string_rendered, rules_rect)
     arrows_sprites.draw(screen)
     while True:
         pygame.display.flip()
