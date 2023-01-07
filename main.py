@@ -89,60 +89,60 @@ theatre_button.rect.y = HEIGHT / 2 - HEIGHT / 6
 # передняя часть
 theatre_front_box = pygame.sprite.Sprite(theatre_front_sprites)
 theatre_front_box.image = load_image("theatre_front_box.png")
-theatre_front_box.image = pygame.transform.scale(theatre_front_box.image, (WIDTH, HEIGHT))
+theatre_front_box.image = pygame.transform.scale(theatre_front_box.image, (214, 266))
 theatre_front_box.rect = theatre_front_box.image.get_rect()
 theatre_front_box.rect.x = 0
-theatre_front_box.rect.y = 0
+theatre_front_box.rect.y = 420
 
 theatre_front_door = pygame.sprite.Sprite(theatre_front_sprites)
 theatre_front_door.image = load_image("theatre_front_door.png")
-theatre_front_door.image = pygame.transform.scale(theatre_front_door.image, (WIDTH, HEIGHT))
+theatre_front_door.image = pygame.transform.scale(theatre_front_door.image, (245, 500))
 theatre_front_door.rect = theatre_front_door.image.get_rect()
-theatre_front_door.rect.x = 0
-theatre_front_door.rect.y = 0
+theatre_front_door.rect.x = 410
+theatre_front_door.rect.y = 200
 
 theatre_front_hanger = pygame.sprite.Sprite(theatre_front_sprites)
 theatre_front_hanger.image = load_image("theatre_front_hanger.png")
-theatre_front_hanger.image = pygame.transform.scale(theatre_front_hanger.image, (WIDTH, HEIGHT))
+theatre_front_hanger.image = pygame.transform.scale(theatre_front_hanger.image, (124, 575))
 theatre_front_hanger.rect = theatre_front_hanger.image.get_rect()
-theatre_front_hanger.rect.x = 0
-theatre_front_hanger.rect.y = 0
+theatre_front_hanger.rect.x = 260
+theatre_front_hanger.rect.y = 125
 
 theatre_front_noteboard = pygame.sprite.Sprite(theatre_front_sprites)
 theatre_front_noteboard.image = load_image("theatre_front_noteboard.png")
-theatre_front_noteboard.image = pygame.transform.scale(theatre_front_noteboard.image, (WIDTH, HEIGHT))
+theatre_front_noteboard.image = pygame.transform.scale(theatre_front_noteboard.image, (234, 235))
 theatre_front_noteboard.rect = theatre_front_noteboard.image.get_rect()
 theatre_front_noteboard.rect.x = 0
-theatre_front_noteboard.rect.y = 0
+theatre_front_noteboard.rect.y = 90
 
 # левая часть
 theatre_left_box = pygame.sprite.Sprite(theatre_left_sprites)
 theatre_left_box.image = load_image("theatre_left_box.png")
-theatre_left_box.image = pygame.transform.scale(theatre_left_box.image, (WIDTH, HEIGHT))
+theatre_left_box.image = pygame.transform.scale(theatre_left_box.image, (140, 81))
 theatre_left_box.rect = theatre_left_box.image.get_rect()
-theatre_left_box.rect.x = 0
-theatre_left_box.rect.y = 0
+theatre_left_box.rect.x = 340
+theatre_left_box.rect.y = 595
 
 theatre_front_door = pygame.sprite.Sprite(theatre_left_sprites)
 theatre_front_door.image = load_image("theatre_left_door.png")
-theatre_front_door.image = pygame.transform.scale(theatre_front_door.image, (WIDTH, HEIGHT))
+theatre_front_door.image = pygame.transform.scale(theatre_front_door.image, (273, 273))
 theatre_front_door.rect = theatre_front_door.image.get_rect()
 theatre_front_door.rect.x = 0
-theatre_front_door.rect.y = 0
+theatre_front_door.rect.y = 410
 
 theatre_left_sprout = pygame.sprite.Sprite(theatre_left_sprites)
 theatre_left_sprout.image = load_image("theatre_left_sprout.png")
-theatre_left_sprout.image = pygame.transform.scale(theatre_left_sprout.image, (WIDTH, HEIGHT))
+theatre_left_sprout.image = pygame.transform.scale(theatre_left_sprout.image, (35, 54))
 theatre_left_sprout.rect = theatre_left_sprout.image.get_rect()
-theatre_left_sprout.rect.x = 0
-theatre_left_sprout.rect.y = 0
+theatre_left_sprout.rect.x = 215
+theatre_left_sprout.rect.y = 257
 
 theatre_left_clockface = pygame.sprite.Sprite(theatre_left_sprites)
 theatre_left_clockface.image = load_image("theatre_left_clockface.png")
-theatre_left_clockface.image = pygame.transform.scale(theatre_left_clockface.image, (WIDTH, HEIGHT))
+theatre_left_clockface.image = pygame.transform.scale(theatre_left_clockface.image, (114, 107))
 theatre_left_clockface.rect = theatre_left_clockface.image.get_rect()
-theatre_left_clockface.rect.x = 0
-theatre_left_clockface.rect.y = 0
+theatre_left_clockface.rect.x = 353
+theatre_left_clockface.rect.y = 95
 
 
 def terminate():
