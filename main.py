@@ -38,10 +38,13 @@ rules_screen_sprites = pygame.sprite.Group()
 select_level_sprites = pygame.sprite.Group()
 arrows_sprites = pygame.sprite.Group()  # левая стрелка
 arrow_sprites = pygame.sprite.Group()  # правая стрелка
+arro_sprites = pygame.sprite.Group()  # стрелка вниз
 theatre_front_sprites = pygame.sprite.Group()
 theatre_left_sprites = pygame.sprite.Group()
 theatre_right_sprites = pygame.sprite.Group()
 theatre_back_sprites = pygame.sprite.Group()
+seat_sprites = pygame.sprite.Group()
+board_sprites = pygame.sprite.Group()
 
 
 start_button = pygame.sprite.Sprite(start_screen_sprites)
@@ -78,6 +81,13 @@ right_arrow.image = load_image("right_arrow.png")
 right_arrow.rect = right_arrow.image.get_rect()
 right_arrow.rect.x = WIDTH / 1.08
 right_arrow.rect.y = HEIGHT - HEIGHT / 10
+
+# стрелка вниз
+down_arrow = pygame.sprite.Sprite(arro_sprites)
+down_arrow.image = load_image("down_arrow.png")
+down_arrow.rect = down_arrow.image.get_rect()
+down_arrow.rect.x = WIDTH / 2
+down_arrow.rect.y = HEIGHT - HEIGHT / 15
 
 # запуск театра
 theatre_button = pygame.sprite.Sprite(select_level_sprites)
@@ -183,11 +193,23 @@ theatre_back_scene.rect = theatre_back_scene.image.get_rect()
 theatre_back_scene.rect.x = 0
 theatre_back_scene.rect.y = 367
 
+water = pygame.sprite.Sprite(seat_sprites)
+water.image = load_image("water.png")
+water.image = pygame.transform.scale(water.image, (172*1.5, 307*1.5))
+water.rect = water.image.get_rect()
+water.rect.x = 200
+water.rect.y = 150
+
+comedy = pygame.sprite.Sprite(board_sprites)
+comedy.image = load_image("comedy.png")
+comedy.image = pygame.transform.scale(comedy.image, (252, 332))
+comedy.rect = comedy.image.get_rect()
+comedy.rect.x = 200
+comedy.rect.y = 150
 
 def terminate():
     pygame.quit()
     sys.exit()
-
 
 def start_screen():
     global start
@@ -204,7 +226,6 @@ def start_screen():
                     return select_level()
                 elif rules_button.rect.collidepoint(event.pos):
                     return show_rules()
-
 
 def select_level():
     fon = pygame.transform.scale(load_image('level_select.png'), (WIDTH, HEIGHT))
@@ -224,7 +245,6 @@ def select_level():
                 elif marble_button.rect.collidepoint(event.pos):
                     return marble_front()
 
-
 def show_rules():
     fon = pygame.transform.scale(load_image('rules_screen.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
@@ -238,6 +258,14 @@ def show_rules():
                 if left_arrow.rect.collidepoint(event.pos):
                     return start_screen()
 
+def marble_front():
+    screen = pygame.display.set_mode(size)
+    screen.fill('turquoise')
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
 
 def theatre_front():
     fon = pygame.transform.scale(load_image('theatre_front.png'), (WIDTH, HEIGHT))
@@ -256,7 +284,6 @@ def theatre_front():
                 elif right_arrow.rect.collidepoint(event.pos):
                     return theatre_right()
 
-
 def theatre_left():
     fon = pygame.transform.scale(load_image('theatre_left.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
@@ -273,7 +300,6 @@ def theatre_left():
                     return theatre_back()
                 elif right_arrow.rect.collidepoint(event.pos):
                     return theatre_front()
-
 
 def theatre_right():
     fon = pygame.transform.scale(load_image('theatre_right.png'), (WIDTH, HEIGHT))
@@ -292,7 +318,6 @@ def theatre_right():
                 elif right_arrow.rect.collidepoint(event.pos):
                     return theatre_back()
 
-
 def theatre_back():
     fon = pygame.transform.scale(load_image('theatre_back.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
@@ -309,16 +334,38 @@ def theatre_back():
                     return theatre_right()
                 elif right_arrow.rect.collidepoint(event.pos):
                     return theatre_left()
+                elif theatre_back_seat.rect.collidepoint(event.pos):
+                    return seat()
+                elif theatre_back_scene.rect.collidepoint(event.pos):
+                    return board()
 
-
-def marble_front():
-    screen = pygame.display.set_mode(size)
-    screen.fill('turquoise')
+def seat():
+    fon = pygame.transform.scale(load_image('seat.png'), (WIDTH, HEIGHT))
+    screen.blit(fon, (0, 0))
+    seat_sprites.draw(screen)
+    arro_sprites.draw(screen)  # стрелка вниз
     while True:
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if down_arrow.rect.collidepoint(event.pos):
+                    return theatre_back()
+
+def board():
+    fon = pygame.transform.scale(load_image('board.png'), (WIDTH, HEIGHT))
+    screen.blit(fon, (0, 0))
+    board_sprites.draw(screen)
+    arro_sprites.draw(screen)
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if down_arrow.rect.collidepoint(event.pos):
+                    return theatre_back()
 
 
 start_screen()
