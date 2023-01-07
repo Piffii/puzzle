@@ -8,7 +8,7 @@ FPS = 60
 start = False
 size = WIDTH, HEIGHT = 700, 700
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption('Название игры')
+pygame.display.set_caption('Мистер Банеееейн, Mr. Bannaaaame')
 clock = pygame.time.Clock()
 
 
@@ -79,12 +79,21 @@ right_arrow.rect = right_arrow.image.get_rect()
 right_arrow.rect.x = WIDTH / 1.08
 right_arrow.rect.y = HEIGHT - HEIGHT / 10
 
+# запуск театра
 theatre_button = pygame.sprite.Sprite(select_level_sprites)
 theatre_button.image = load_image("theatre_button.png")
-theatre_button.image = pygame.transform.scale(theatre_button.image, (WIDTH / 2, HEIGHT / 2))
+theatre_button.image = pygame.transform.scale(theatre_button.image, (254, 318))
 theatre_button.rect = theatre_button.image.get_rect()
-theatre_button.rect.x = WIDTH / 6
-theatre_button.rect.y = HEIGHT / 2 - HEIGHT / 6
+theatre_button.rect.x = 50
+theatre_button.rect.y = 250
+
+# запуск мрамора
+marble_button = pygame.sprite.Sprite(select_level_sprites)
+marble_button.image = load_image("marble_button.png")
+marble_button.image = pygame.transform.scale(marble_button.image, (254, 319))
+marble_button.rect = marble_button.image.get_rect()
+marble_button.rect.x = 400
+marble_button.rect.y = 250
 
 # передняя часть
 theatre_front_box = pygame.sprite.Sprite(theatre_front_sprites)
@@ -211,7 +220,9 @@ def select_level():
                 if left_arrow.rect.collidepoint(event.pos):
                     return start_screen()
                 elif theatre_button.rect.collidepoint(event.pos):
-                    return
+                    return theatre_front()
+                elif marble_button.rect.collidepoint(event.pos):
+                    return marble_front()
 
 
 def show_rules():
@@ -228,6 +239,24 @@ def show_rules():
                     return start_screen()
 
 
+def theatre_front():
+    fon = pygame.transform.scale(load_image('theatre_front.png'), (WIDTH, HEIGHT))
+    screen.blit(fon, (0, 0))
+    theatre_front_sprites.draw(screen)
+    arrows_sprites.draw(screen)  # левая стрелка
+    arrow_sprites.draw(screen)  # правая стрелка
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if left_arrow.rect.collidepoint(event.pos):
+                    return theatre_left()
+                elif right_arrow.rect.collidepoint(event.pos):
+                    return theatre_right()
+
+
 def theatre_left():
     fon = pygame.transform.scale(load_image('theatre_left.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
@@ -241,9 +270,9 @@ def theatre_left():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if left_arrow.rect.collidepoint(event.pos):
-                    theatre_back()
+                    return theatre_back()
                 elif right_arrow.rect.collidepoint(event.pos):
-                    return
+                    return theatre_front()
 
 
 def theatre_right():
@@ -259,9 +288,9 @@ def theatre_right():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if left_arrow.rect.collidepoint(event.pos):
-                    return
+                    return theatre_front()
                 elif right_arrow.rect.collidepoint(event.pos):
-                    theatre_back()
+                    return theatre_back()
 
 
 def theatre_back():
@@ -280,6 +309,16 @@ def theatre_back():
                     return theatre_right()
                 elif right_arrow.rect.collidepoint(event.pos):
                     return theatre_left()
+
+
+def marble_front():
+    screen = pygame.display.set_mode(size)
+    screen.fill('turquoise')
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
 
 
 start_screen()
