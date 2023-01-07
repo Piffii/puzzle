@@ -5,7 +5,7 @@ import os
 
 pygame.init()
 FPS = 60
-size = WIDTH, HEIGHT = 700, 900
+size = WIDTH, HEIGHT = 700, 780  # чисто для себя размер поставила
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Мистер Банеееейн, Mr. Bannaaaame')
 clock = pygame.time.Clock()
@@ -44,22 +44,28 @@ select_level_sprites = pygame.sprite.Group()
 arrows_sprites = pygame.sprite.Group()  # левая стрелка
 arrow_sprites = pygame.sprite.Group()  # правая стрелка
 arro_sprites = pygame.sprite.Group()  # стрелка вниз
-theatre_front_sprites = pygame.sprite.Group()
-theatre_left_sprites = pygame.sprite.Group()
-theatre_right_sprites = pygame.sprite.Group()
-theatre_back_sprites = pygame.sprite.Group()
-seat_sprites = pygame.sprite.Group()
-board_sprites = pygame.sprite.Group()
+# спрайты театра
+theatre_front_sprites = pygame.sprite.Group()  # перед
+theatre_left_sprites = pygame.sprite.Group()  # лево
+theatre_right_sprites = pygame.sprite.Group()  # право
+theatre_back_sprites = pygame.sprite.Group()  # сзади
+seat_sprites = pygame.sprite.Group()  # сиденье
+board_sprites = pygame.sprite.Group()  # доска
 key_sprites = pygame.sprite.Group()
-theatre_right_box_inside = pygame.sprite.Group()
-theatre_right_box_clock_arrows = pygame.sprite.Group()
-theatre_right_box_code_first = pygame.sprite.Group()
+theatre_right_box_inside = pygame.sprite.Group()  # право внутри ящика
+theatre_right_box_clock_arrows = pygame.sprite.Group()  # право стрелки часов
+theatre_right_box_code_first = pygame.sprite.Group()  # код первая цифра
 inventory_sprites_key = pygame.sprite.Group()
 inventory_sprites_clock_arrows = pygame.sprite.Group()
 inventory_sprites_code_first = pygame.sprite.Group()
-theatre_left_clock_arrows = pygame.sprite.Group()
+theatre_left_clock_arrows = pygame.sprite.Group()  # право стрелки часов
+# спрайты мрамора
+marble_front_sprites = pygame.sprite.Group()
+marble_right_sprites = pygame.sprite.Group()
+marble_left_sprites = pygame.sprite.Group()
+marble_back_sprites = pygame.sprite.Group()
 
-
+# начальный экран
 start_button = pygame.sprite.Sprite(start_screen_sprites)
 start_button.image = load_image("start_button.png")
 start_button.image = pygame.transform.scale(start_button.image, (WIDTH / 4, HEIGHT / 9))
@@ -118,7 +124,14 @@ marble_button.rect = marble_button.image.get_rect()
 marble_button.rect.x = 400
 marble_button.rect.y = 300
 
-# передняя часть
+# передняя часть театра
+exit_button = pygame.sprite.Sprite(theatre_front_sprites)
+exit_button.image = load_image("exit_button.png")
+exit_button.image = pygame.transform.scale(exit_button.image, (111, 39))
+exit_button.rect = exit_button.image.get_rect()
+exit_button.rect.x = 10
+exit_button.rect.y = 20
+
 theatre_front_box = pygame.sprite.Sprite(theatre_front_sprites)
 theatre_front_box.image = load_image("theatre_front_box.png")
 theatre_front_box.image = pygame.transform.scale(theatre_front_box.image, (214, 266))
@@ -154,7 +167,29 @@ key.rect = key.image.get_rect()
 key.rect.x = 330
 key.rect.y = 350
 
-# левая часть
+# передняя часть мрамора
+exit_button = pygame.sprite.Sprite(marble_front_sprites)
+exit_button.image = load_image("exit_button.png")
+exit_button.image = pygame.transform.scale(exit_button.image, (111, 39))
+exit_button.rect = exit_button.image.get_rect()
+exit_button.rect.x = 10
+exit_button.rect.y = 20
+
+marble_front_painting = pygame.sprite.Sprite(marble_front_sprites)
+marble_front_painting.image = load_image("marble_front_painting.png")
+marble_front_painting.image = pygame.transform.scale(marble_front_painting.image, (263, 245))
+marble_front_painting.rect = marble_front_painting.image.get_rect()
+marble_front_painting.rect.x = 70
+marble_front_painting.rect.y = 455
+
+marble_front_door = pygame.sprite.Sprite(marble_front_sprites)
+marble_front_door.image = load_image("marble_front_door.png")
+marble_front_door.image = pygame.transform.scale(marble_front_door.image, (289, 616))
+marble_front_door.rect = marble_front_door.image.get_rect()
+marble_front_door.rect.x = 350
+marble_front_door.rect.y = 85
+
+# левая часть театра
 theatre_left_box = pygame.sprite.Sprite(theatre_left_sprites)
 theatre_left_box.image = load_image("theatre_left_box.png")
 theatre_left_box.image = pygame.transform.scale(theatre_left_box.image, (140, 81))
@@ -190,7 +225,15 @@ clock_arrows_left.rect = clock_arrows_left.image.get_rect()
 clock_arrows_left.rect.x = 384
 clock_arrows_left.rect.y = 134
 
-# правая часть
+# левая часть мрамора
+marble_left_armchair = pygame.sprite.Sprite(marble_left_sprites)
+marble_left_armchair.image = load_image("marble_left_armchair.png")
+marble_left_armchair.image = pygame.transform.scale(marble_left_armchair.image, (259, 308))
+marble_left_armchair.rect = marble_left_armchair.image.get_rect()
+marble_left_armchair.rect.x = 50
+marble_left_armchair.rect.y = 392
+
+# правая часть театра
 theatre_right_box = pygame.sprite.Sprite(theatre_right_sprites)
 theatre_right_box.image = load_image("theatre_right_box.png")
 theatre_right_box.image = pygame.transform.scale(theatre_right_box.image, (417, 96))
@@ -218,7 +261,29 @@ code_first.rect = code_first.image.get_rect()
 code_first.rect.x = 480
 code_first.rect.y = 240
 
-# задняя часть
+# правая часть мрамора
+marble_right_pot = pygame.sprite.Sprite(marble_right_sprites)
+marble_right_pot.image = load_image("marble_right_pot.png")
+marble_right_pot.image = pygame.transform.scale(marble_right_pot.image, (131, 130))
+marble_right_pot.rect = marble_right_pot.image.get_rect()
+marble_right_pot.rect.x = 540
+marble_right_pot.rect.y = 570
+
+marble_right_pillow = pygame.sprite.Sprite(marble_right_sprites)
+marble_right_pillow.image = load_image("marble_right_pillow.png")
+marble_right_pillow.image = pygame.transform.scale(marble_right_pillow.image, (108, 65))
+marble_right_pillow.rect = marble_right_pillow.image.get_rect()
+marble_right_pillow.rect.x = 400
+marble_right_pillow.rect.y = 405
+
+marble_right_lattice = pygame.sprite.Sprite(marble_right_sprites)
+marble_right_lattice.image = load_image("marble_right_lattice.png")  # при взаимодействие поворачивается на 90 вниз
+marble_right_lattice.image = pygame.transform.scale(marble_right_lattice.image, (222, 78))
+marble_right_lattice.rect = marble_right_lattice.image.get_rect()
+marble_right_lattice.rect.x = 6
+marble_right_lattice.rect.y = 26
+
+# задняя часть театра
 theatre_back_seat = pygame.sprite.Sprite(theatre_back_sprites)
 theatre_back_seat.image = load_image("theatre_back_seats.png")
 theatre_back_seat.image = pygame.transform.scale(theatre_back_seat.image, (700, 530))
@@ -246,6 +311,21 @@ comedy.image = pygame.transform.scale(comedy.image, (252, 332))
 comedy.rect = comedy.image.get_rect()
 comedy.rect.x = 200
 comedy.rect.y = 150
+
+# задняя часть мрамора
+marble_back_topbox = pygame.sprite.Sprite(marble_back_sprites)
+marble_back_topbox.image = load_image("marble_back_topbox.png")
+marble_back_topbox.image = pygame.transform.scale(marble_back_topbox.image, (415, 128))
+marble_back_topbox.rect = marble_back_topbox.image.get_rect()
+marble_back_topbox.rect.x = 252
+marble_back_topbox.rect.y = 430
+
+marble_back_bottombox = pygame.sprite.Sprite(marble_back_sprites)
+marble_back_bottombox.image = load_image("marble_back_bottombox.png")
+marble_back_bottombox.image = pygame.transform.scale(marble_back_bottombox.image, (415, 96))
+marble_back_bottombox.rect = marble_back_bottombox.image.get_rect()
+marble_back_bottombox.rect.x = 252
+marble_back_bottombox.rect.y = 560
 
 # инвентарь
 inventory_key = pygame.sprite.Sprite(inventory_sprites_key)
@@ -306,9 +386,10 @@ def select_level():
                     return start_screen()
                 elif theatre_button.rect.collidepoint(event.pos):
                     screen.fill((255, 255, 255))
-                    return theatre_front()
+                    theatre_front()
                 elif marble_button.rect.collidepoint(event.pos):
-                    return marble_front()
+                    screen.fill((255, 255, 255))
+                    marble_front()
 
 
 def show_rules():
@@ -325,16 +406,82 @@ def show_rules():
                     return start_screen()
 
 
+# Мрамор
 def marble_front():
-    screen = pygame.display.set_mode(size)
-    screen.fill('turquoise')
+    fon = pygame.transform.scale(load_image('marble_front.png'), (700, 700))
+    screen.blit(fon, (0, 0))
+    marble_front_sprites.draw(screen)
+    arrows_sprites.draw(screen)  # левая стрелка
+    arrow_sprites.draw(screen)  # правая стрелка
     while True:
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if left_arrow.rect.collidepoint(event.pos):
+                    return marble_left()
+                elif right_arrow.rect.collidepoint(event.pos):
+                    return marble_right()
+                elif exit_button.rect.collidepoint(event.pos):
+                    return select_level()
 
 
+def marble_right():
+    fon = pygame.transform.scale(load_image('marble_right.png'), (700, 700))
+    screen.blit(fon, (0, 0))
+    marble_right_sprites.draw(screen)
+    arrows_sprites.draw(screen)  # левая стрелка
+    arrow_sprites.draw(screen)  # правая стрелка
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if left_arrow.rect.collidepoint(event.pos):
+                    return marble_front()
+                elif right_arrow.rect.collidepoint(event.pos):
+                    return marble_back()
+
+
+def marble_left():
+    fon = pygame.transform.scale(load_image('marble_left.png'), (700, 700))
+    screen.blit(fon, (0, 0))
+    marble_left_sprites.draw(screen)
+    arrows_sprites.draw(screen)  # левая стрелка
+    arrow_sprites.draw(screen)  # правая стрелка
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if left_arrow.rect.collidepoint(event.pos):
+                    return marble_back()
+                elif right_arrow.rect.collidepoint(event.pos):
+                    return marble_front()
+
+
+def marble_back():
+    fon = pygame.transform.scale(load_image('marble_back.png'), (700, 700))
+    screen.blit(fon, (0, 0))
+    marble_back_sprites.draw(screen)
+    arrows_sprites.draw(screen)  # левая стрелка
+    arrow_sprites.draw(screen)  # правая стрелка
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if left_arrow.rect.collidepoint(event.pos):
+                    return marble_right()
+                elif right_arrow.rect.collidepoint(event.pos):
+                    return marble_left()
+
+
+# Театр
 def theatre_front():
     global first_code
     screen.fill((255, 255, 255))
@@ -356,6 +503,8 @@ def theatre_front():
                     return theatre_left()
                 elif right_arrow.rect.collidepoint(event.pos):
                     return theatre_right()
+                elif exit_button.rect.collidepoint(event.pos):
+                    return select_level()
                 elif theatre_front_hanger.rect.collidepoint(event.pos) and 'key' not in inventory:
                     return show_key()
         pygame.display.flip()
@@ -525,21 +674,11 @@ def board():
 
 
 start_screen()
-screen.blit(pygame.transform.scale(load_image('theatre_front.png'), (700, 700)), (0, 0))
-theatre_front_sprites.draw(screen)
-arrows_sprites.draw(screen)
-arrow_sprites.draw(screen)
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if left_arrow.rect.collidepoint(event.pos):
-                theatre_left()
-            if right_arrow.rect.collidepoint(event.pos):
-                theatre_right()
-    all_sprites.draw(screen)
     clock.tick(FPS)
     pygame.display.flip()
 pygame.quit()
