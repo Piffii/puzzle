@@ -59,11 +59,16 @@ inventory_sprites_key = pygame.sprite.Group()
 inventory_sprites_clock_arrows = pygame.sprite.Group()
 inventory_sprites_code_first = pygame.sprite.Group()
 theatre_left_clock_arrows = pygame.sprite.Group()  # право стрелки часов
+show_theatre_front_box_sprites = pygame.sprite.Group()  # перед внутри ящика
+clock_box_inside_sprites = pygame.sprite.Group()  # лево внутри ящика часов
+box_inside_sprites = pygame.sprite.Group()  # лево внутри ящика
 # спрайты мрамора
 marble_front_sprites = pygame.sprite.Group()
 marble_right_sprites = pygame.sprite.Group()
 marble_left_sprites = pygame.sprite.Group()
 marble_back_sprites = pygame.sprite.Group()
+bottombox_sprites = pygame.sprite.Group()
+topbox_sprites = pygame.sprite.Group()
 
 # начальный экран
 start_button = pygame.sprite.Sprite(start_screen_sprites)
@@ -167,6 +172,13 @@ key.rect = key.image.get_rect()
 key.rect.x = 330
 key.rect.y = 350
 
+tragedy = pygame.sprite.Sprite(show_theatre_front_box_sprites)  # маска
+tragedy.image = load_image("tragedy.png")
+tragedy.image = pygame.transform.scale(tragedy.image, (252, 332))
+tragedy.rect = tragedy.image.get_rect()
+tragedy.rect.x = 200
+tragedy.rect.y = 150
+
 # передняя часть мрамора
 exit_button = pygame.sprite.Sprite(marble_front_sprites)
 exit_button.image = load_image("exit_button.png")
@@ -197,12 +209,12 @@ theatre_left_box.rect = theatre_left_box.image.get_rect()
 theatre_left_box.rect.x = 340
 theatre_left_box.rect.y = 595
 
-theatre_front_door = pygame.sprite.Sprite(theatre_left_sprites)
-theatre_front_door.image = load_image("theatre_left_door.png")
-theatre_front_door.image = pygame.transform.scale(theatre_front_door.image, (273, 273))
-theatre_front_door.rect = theatre_front_door.image.get_rect()
-theatre_front_door.rect.x = 0
-theatre_front_door.rect.y = 410
+theatre_left_door = pygame.sprite.Sprite(theatre_left_sprites)
+theatre_left_door.image = load_image("theatre_left_door.png")
+theatre_left_door.image = pygame.transform.scale(theatre_left_door.image, (273, 273))
+theatre_left_door.rect = theatre_left_door.image.get_rect()
+theatre_left_door.rect.x = 0
+theatre_left_door.rect.y = 410
 
 theatre_left_sprout = pygame.sprite.Sprite(theatre_left_sprites)
 theatre_left_sprout.image = load_image("theatre_left_sprout.png")
@@ -224,6 +236,41 @@ clock_arrows_left.image = pygame.transform.scale(clock_arrows_left.image, (65, 5
 clock_arrows_left.rect = clock_arrows_left.image.get_rect()
 clock_arrows_left.rect.x = 384
 clock_arrows_left.rect.y = 134
+# внутри часов
+scrap = pygame.sprite.Sprite(clock_box_inside_sprites)
+scrap.image = load_image("scrap.png")
+scrap.image = pygame.transform.scale(scrap.image, (284, 347))
+scrap.rect = scrap.image.get_rect()
+scrap.rect.x = 100
+scrap.rect.y = 100
+
+coin = pygame.sprite.Sprite(clock_box_inside_sprites)
+coin.image = load_image("coin.png")
+coin.image = pygame.transform.scale(coin.image, (67, 70))
+coin.rect = coin.image.get_rect()
+coin.rect.x = 350
+coin.rect.y = 200
+
+code_two = pygame.sprite.Sprite(clock_box_inside_sprites)
+code_two.image = load_image("code_two.png")
+code_two.image = pygame.transform.scale(code_two.image, (92, 96))
+code_two.rect = code_two.image.get_rect()
+code_two.rect.x = 400
+code_two.rect.y = 400
+# внутри ящика
+code_four = pygame.sprite.Sprite(box_inside_sprites)
+code_four.image = load_image("code_four.png")
+code_four.image = pygame.transform.scale(code_four.image, (101, 56))
+code_four.rect = code_four.image.get_rect()
+code_four.rect.x = 320
+code_four.rect.y = 350
+
+key_theatre_door = pygame.sprite.Sprite(box_inside_sprites)
+key_theatre_door.image = load_image("key_theatre_door.png")
+key_theatre_door.image = pygame.transform.scale(key_theatre_door.image, (40, 90))
+key_theatre_door.rect = key_theatre_door.image.get_rect()
+key_theatre_door.rect.x = 50
+key_theatre_door.rect.y = 570
 
 # левая часть мрамора
 marble_left_armchair = pygame.sprite.Sprite(marble_left_sprites)
@@ -305,7 +352,7 @@ water.rect = water.image.get_rect()
 water.rect.x = 200
 water.rect.y = 150
 
-comedy = pygame.sprite.Sprite(board_sprites)
+comedy = pygame.sprite.Sprite(board_sprites)  # маска
 comedy.image = load_image("comedy.png")
 comedy.image = pygame.transform.scale(comedy.image, (252, 332))
 comedy.rect = comedy.image.get_rect()
@@ -326,6 +373,20 @@ marble_back_bottombox.image = pygame.transform.scale(marble_back_bottombox.image
 marble_back_bottombox.rect = marble_back_bottombox.image.get_rect()
 marble_back_bottombox.rect.x = 252
 marble_back_bottombox.rect.y = 560
+
+screwdriver = pygame.sprite.Sprite(topbox_sprites)
+screwdriver.image = load_image("screwdriver.png")
+screwdriver.image = pygame.transform.scale(screwdriver.image, (321, 210))
+screwdriver.rect = screwdriver.image.get_rect()
+screwdriver.rect.x = 200
+screwdriver.rect.y = 250
+
+tassel = pygame.sprite.Sprite(bottombox_sprites)
+tassel.image = load_image("tassel.png")
+tassel.image = pygame.transform.scale(tassel.image, (219, 219))
+tassel.rect = tassel.image.get_rect()
+tassel.rect.x = 200
+tassel.rect.y = 250
 
 # инвентарь
 inventory_key = pygame.sprite.Sprite(inventory_sprites_key)
@@ -479,6 +540,40 @@ def marble_back():
                     return marble_right()
                 elif right_arrow.rect.collidepoint(event.pos):
                     return marble_left()
+                elif marble_back_topbox.rect.collidepoint(event.pos):
+                    return top_box()
+                elif marble_back_bottombox.rect.collidepoint(event.pos):
+                    return bottom_box()
+
+
+def top_box():
+    fon = pygame.transform.scale(load_image('marble_top_box.png'), (700, 700))
+    screen.blit(fon, (0, 0))
+    topbox_sprites.draw(screen)
+    arro_sprites.draw(screen)
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if down_arrow.rect.collidepoint(event.pos):
+                    return marble_back()
+
+
+def bottom_box():
+    fon = pygame.transform.scale(load_image('marble_bottom_box.png'), (700, 700))
+    screen.blit(fon, (0, 0))
+    bottombox_sprites.draw(screen)
+    arro_sprites.draw(screen)
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if down_arrow.rect.collidepoint(event.pos):
+                    return marble_back()
 
 
 # Театр
@@ -505,9 +600,26 @@ def theatre_front():
                     return theatre_right()
                 elif exit_button.rect.collidepoint(event.pos):
                     return select_level()
+                elif theatre_front_box.rect.collidepoint(event.pos):
+                    return show_theatre_front_box()
                 elif theatre_front_hanger.rect.collidepoint(event.pos) and 'key' not in inventory:
                     return show_key()
         pygame.display.flip()
+
+
+def show_theatre_front_box():
+    fon = pygame.transform.scale(load_image('theatre_front_box_inside.png'), (700, 700))
+    screen.blit(fon, (0, 0))
+    show_theatre_front_box_sprites.draw(screen)
+    arro_sprites.draw(screen)
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if down_arrow.rect.collidepoint(event.pos):
+                    return theatre_front()
 
 
 def show_key():
@@ -545,10 +657,44 @@ def theatre_left():
                     return theatre_back()
                 elif right_arrow.rect.collidepoint(event.pos):
                     return theatre_front()
+                elif theatre_left_box.rect.collidepoint(event.pos):
+                    return clock_box_inside()
+                elif theatre_left_door.rect.collidepoint(event.pos):
+                    return box_inside()
                 elif theatre_left_clockface.rect.collidepoint(event.pos) and 'clock_arrows' in inventory:
                     theatre_left_clock_arrows.draw(screen)
                     clock_arrows_set = True
                     inventory.remove('clock_arrows')
+
+
+def clock_box_inside():
+    fon = pygame.transform.scale(load_image('clock_box_inside.png'), (700, 700))
+    screen.blit(fon, (0, 0))
+    clock_box_inside_sprites.draw(screen)
+    arro_sprites.draw(screen)
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if down_arrow.rect.collidepoint(event.pos):
+                    return theatre_left()
+
+
+def box_inside():
+    fon = pygame.transform.scale(load_image('box_inside.png'), (700, 700))
+    screen.blit(fon, (0, 0))
+    box_inside_sprites.draw(screen)
+    arro_sprites.draw(screen)
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if down_arrow.rect.collidepoint(event.pos):
+                    return theatre_left()
 
 
 def theatre_right():
