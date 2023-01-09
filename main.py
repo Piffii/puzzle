@@ -66,6 +66,11 @@ inventory_sprites_coin = pygame.sprite.Group()
 inventory_sprites_code_second = pygame.sprite.Group()
 inventory_sprites_code_third = pygame.sprite.Group()
 inventory_sprites_code_fourth = pygame.sprite.Group()
+inventory_sprites_scrap = pygame.sprite.Group()
+inventory_sprites_comedy = pygame.sprite.Group()
+inventory_sprites_water = pygame.sprite.Group()
+fertilizers_sprite = pygame.sprite.Group()
+inventory_sprites_fertilizers = pygame.sprite.Group()
 
 # спрайты мрамора
 marble_front_sprites = pygame.sprite.Group()
@@ -313,6 +318,13 @@ code_first.rect = code_first.image.get_rect()
 code_first.rect.x = 480
 code_first.rect.y = 240
 
+fertilizers = pygame.sprite.Sprite(fertilizers_sprite)
+fertilizers.image = load_image("fertilizers.png")
+fertilizers.image = pygame.transform.scale(fertilizers.image, (52, 64))
+fertilizers.rect = fertilizers.image.get_rect()
+fertilizers.rect.x = 550
+fertilizers.rect.y = 340
+
 # правая часть мрамора
 marble_right_pot = pygame.sprite.Sprite(marble_right_sprites)
 marble_right_pot.image = load_image("marble_right_pot.png")
@@ -443,6 +455,34 @@ inventory_coin.image = pygame.transform.scale(inventory_coin.image, (67, 70))
 inventory_coin.rect = inventory_coin.image.get_rect()
 inventory_coin.rect.x = 317
 inventory_coin.rect.y = 715
+
+inventory_scrap = pygame.sprite.Sprite(inventory_sprites_scrap)
+inventory_scrap.image = load_image("scrap.png")
+inventory_scrap.image = pygame.transform.scale(inventory_scrap.image, (95, 116))
+inventory_scrap.rect = inventory_scrap.image.get_rect()
+inventory_scrap.rect.x = 443
+inventory_scrap.rect.y = 700
+
+inventory_comedy = pygame.sprite.Sprite(inventory_sprites_comedy)
+inventory_comedy.image = load_image("comedy.png")
+inventory_comedy.image = pygame.transform.scale(inventory_comedy.image, (63, 83))
+inventory_comedy.rect = inventory_comedy.image.get_rect()
+inventory_comedy.rect.x = 598
+inventory_comedy.rect.y = 709
+
+inventory_water = pygame.sprite.Sprite(inventory_sprites_water)
+inventory_water.image = load_image("water.png")
+inventory_water.image = pygame.transform.scale(inventory_water.image, (65, 98))
+inventory_water.rect = inventory_water.image.get_rect()
+inventory_water.rect.x = 38
+inventory_water.rect.y = 803
+
+inventory_fertilizers = pygame.sprite.Sprite(inventory_sprites_fertilizers)
+inventory_fertilizers.image = load_image("fertilizers.png")
+inventory_fertilizers.image = pygame.transform.scale(inventory_fertilizers.image, (52, 64))
+inventory_fertilizers.rect = inventory_fertilizers.image.get_rect()
+inventory_fertilizers.rect.x = 185
+inventory_fertilizers.rect.y = 818
 
 
 def terminate():
@@ -716,7 +756,7 @@ def theatre_left():
                     arrows_sprites.draw(screen)  # левая стрелка
                     arrow_sprites.draw(screen)  # правая стрелка
                     theatre_left_clock_arrows.draw(screen)
-                    render_inventory()
+        render_inventory()
 
 
 def clock_box_inside():
@@ -745,6 +785,12 @@ def clock_box_inside():
                     clock_box_inside_sprites.draw(screen)
                     arro_sprites.draw(screen)
                     second_code = True
+                elif scrap.rect.collidepoint(event.pos):
+                    scrap.kill()
+                    screen.blit(fon, (0, 0))
+                    clock_box_inside_sprites.draw(screen)
+                    arro_sprites.draw(screen)
+                    inventory.append('scrap')
         render_inventory()
 
 
@@ -771,6 +817,7 @@ def theatre_right():
     arrows_sprites.draw(screen)  # левая стрелка
     arrow_sprites.draw(screen)  # правая стрелка
     while True:
+        render_inventory()
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -782,7 +829,23 @@ def theatre_right():
                     return theatre_back()
                 elif theatre_right_box.rect.collidepoint(event.pos) and 'key' in inventory:
                     return show_theatre_right_box()
-        render_inventory()
+                elif theatre_right_crack.rect.collidepoint(event.pos) and 'coin' in inventory:
+                    inventory.remove('coin')
+                    show_fertilizers()
+
+
+def show_fertilizers():
+    fertilizers_sprite.draw(screen)
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if fertilizers.rect.collidepoint(event.pos):
+                    inventory.append('fertilizers')
+                    inventory_sprites_fertilizers.draw(screen)
+                    return theatre_right()
 
 
 def show_theatre_right_box():
@@ -854,7 +917,7 @@ def theatre_back():
                     return theatre_left()
                 elif theatre_back_seat.rect.collidepoint(event.pos):
                     return seat()
-                elif theatre_back_scene.rect.collidepoint(event.pos):
+                elif theatre_back_scene.rect.collidepoint(event.pos) and 'scrap' in inventory:
                     return board()
         render_inventory()
 
@@ -870,7 +933,13 @@ def seat():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if down_arrow.rect.collidepoint(event.pos):
+                if water.rect.collidepoint(event.pos):
+                    water.kill()
+                    screen.blit(fon, (0, 0))
+                    seat_sprites.draw(screen)
+                    arro_sprites.draw(screen)
+                    inventory.append('water')
+                elif down_arrow.rect.collidepoint(event.pos):
                     return theatre_back()
         render_inventory()
 
@@ -886,7 +955,19 @@ def board():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if down_arrow.rect.collidepoint(event.pos):
+                if comedy.rect.collidepoint(event.pos):
+                    comedy.kill()
+                    screen.blit(fon, (0, 0))
+                    board_sprites.draw(screen)
+                    arro_sprites.draw(screen)
+                    inventory.append('comedy')
+                elif down_arrow.rect.collidepoint(event.pos) and 'comedy' in inventory:
+                    inventory.remove('scrap')
+                    screen.fill((255, 255, 255))
+                    screen.blit(fon, (0, 0))
+                    arrows_sprites.draw(screen)  # левая стрелка
+                    arrow_sprites.draw(screen)  # правая стрелка
+                    board_sprites.draw(screen)
                     return theatre_back()
         render_inventory()
 
