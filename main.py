@@ -5,7 +5,7 @@ import os
 
 pygame.init()
 FPS = 60
-size = WIDTH, HEIGHT = 700, 780  # чисто для себя размер поставила
+size = WIDTH, HEIGHT = 700, 900  # чисто для себя размер поставила
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Мистер Банеееейн, Mr. Bannaaaame')
 clock = pygame.time.Clock()
@@ -62,6 +62,11 @@ theatre_left_clock_arrows = pygame.sprite.Group()  # право стрелки �
 show_theatre_front_box_sprites = pygame.sprite.Group()  # перед внутри ящика
 clock_box_inside_sprites = pygame.sprite.Group()  # лево внутри ящика часов
 box_inside_sprites = pygame.sprite.Group()  # лево внутри ящика
+inventory_sprites_coin = pygame.sprite.Group()
+inventory_sprites_code_second = pygame.sprite.Group()
+inventory_sprites_code_third = pygame.sprite.Group()
+inventory_sprites_code_fourth = pygame.sprite.Group()
+
 # спрайты мрамора
 marble_front_sprites = pygame.sprite.Group()
 marble_right_sprites = pygame.sprite.Group()
@@ -410,6 +415,35 @@ inventory_code_first.rect = inventory_code_first.image.get_rect()
 inventory_code_first.rect.x = 20
 inventory_code_first.rect.y = 200
 
+inventory_code_second = pygame.sprite.Sprite(inventory_sprites_code_second)
+inventory_code_second.image = load_image("code_two.png")
+inventory_code_second.image = pygame.transform.scale(inventory_code_second.image, (50, 50))
+inventory_code_second.rect = inventory_code_second.image.get_rect()
+inventory_code_second.rect.x = 90
+inventory_code_second.rect.y = 200
+
+#inventory_code_third = pygame.sprite.Sprite(inventory_sprites_code_third)
+#inventory_code_third.image = load_image("code_third.png")
+#inventory_code_third.image = pygame.transform.scale(inventory_code_third.image, (50, 50))
+#inventory_code_third.rect = inventory_code_third.image.get_rect()
+#inventory_code_third.rect.x = 160
+#inventory_code_third.rect.y = 200
+
+inventory_code_fourth = pygame.sprite.Sprite(inventory_sprites_code_fourth)
+inventory_code_fourth.image = load_image("code_four.png")
+inventory_code_fourth.image = pygame.transform.scale(inventory_code_fourth.image, (50, 50))
+inventory_code_fourth.rect = inventory_code_fourth.image.get_rect()
+inventory_code_fourth.rect.x = 230
+inventory_code_fourth.rect.y = 200
+
+
+inventory_coin = pygame.sprite.Sprite(inventory_sprites_coin)
+inventory_coin.image = load_image("coin.png")
+inventory_coin.image = pygame.transform.scale(inventory_coin.image, (67, 70))
+inventory_coin.rect = inventory_coin.image.get_rect()
+inventory_coin.rect.x = 317
+inventory_coin.rect.y = 715
+
 
 def terminate():
     pygame.quit()
@@ -465,6 +499,11 @@ def show_rules():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if left_arrow.rect.collidepoint(event.pos):
                     return start_screen()
+
+
+def render_inventory():
+    for i in inventory:
+        globals()["inventory_sprites_" + i].draw(screen)
 
 
 # Мрамор
@@ -579,17 +618,25 @@ def bottom_box():
 # Театр
 def theatre_front():
     global first_code
+    global second_code
+    global third_code
+    global fourth_code
     screen.fill((255, 255, 255))
     fon = pygame.transform.scale(load_image('theatre_front.png'), (700, 700))
     screen.blit(fon, (0, 0))
     theatre_front_sprites.draw(screen)
     arrows_sprites.draw(screen)  # левая стрелка
     arrow_sprites.draw(screen)  # правая стрелка
-    if first_code is True:
+    if first_code:
         inventory_sprites_code_first.draw(screen)
-    for i in inventory:
-        globals()["inventory_sprites_" + i].draw(screen)
+    if second_code:
+        inventory_sprites_code_second.draw(screen)
+    if third_code:
+        inventory_sprites_code_third.draw(screen)
+    if fourth_code:
+        inventory_sprites_code_fourth.draw(screen)
     while True:
+        render_inventory()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
@@ -613,6 +660,7 @@ def show_theatre_front_box():
     show_theatre_front_box_sprites.draw(screen)
     arro_sprites.draw(screen)
     while True:
+        render_inventory()
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -645,8 +693,6 @@ def theatre_left():
     arrow_sprites.draw(screen)  # правая стрелка
     if clock_arrows_set:
         theatre_left_clock_arrows.draw(screen)
-    for i in inventory:
-        globals()["inventory_sprites_" + i].draw(screen)
     while True:
         pygame.display.flip()
         for event in pygame.event.get():
@@ -657,17 +703,24 @@ def theatre_left():
                     return theatre_back()
                 elif right_arrow.rect.collidepoint(event.pos):
                     return theatre_front()
-                elif theatre_left_box.rect.collidepoint(event.pos):
+                elif theatre_left_box.rect.collidepoint(event.pos) and clock_arrows_set:
                     return clock_box_inside()
                 elif theatre_left_door.rect.collidepoint(event.pos):
                     return box_inside()
                 elif theatre_left_clockface.rect.collidepoint(event.pos) and 'clock_arrows' in inventory:
-                    theatre_left_clock_arrows.draw(screen)
                     clock_arrows_set = True
                     inventory.remove('clock_arrows')
+                    screen.fill((255, 255, 255))
+                    screen.blit(fon, (0, 0))
+                    theatre_left_sprites.draw(screen)
+                    arrows_sprites.draw(screen)  # левая стрелка
+                    arrow_sprites.draw(screen)  # правая стрелка
+                    theatre_left_clock_arrows.draw(screen)
+                    render_inventory()
 
 
 def clock_box_inside():
+    global second_code
     fon = pygame.transform.scale(load_image('clock_box_inside.png'), (700, 700))
     screen.blit(fon, (0, 0))
     clock_box_inside_sprites.draw(screen)
@@ -680,6 +733,19 @@ def clock_box_inside():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_arrow.rect.collidepoint(event.pos):
                     return theatre_left()
+                elif coin.rect.collidepoint(event.pos):
+                    coin.kill()
+                    screen.blit(fon, (0, 0))
+                    clock_box_inside_sprites.draw(screen)
+                    arro_sprites.draw(screen)
+                    inventory.append('coin')
+                elif code_two.rect.collidepoint(event.pos):
+                    code_two.kill()
+                    screen.blit(fon, (0, 0))
+                    clock_box_inside_sprites.draw(screen)
+                    arro_sprites.draw(screen)
+                    second_code = True
+        render_inventory()
 
 
 def box_inside():
@@ -695,6 +761,7 @@ def box_inside():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_arrow.rect.collidepoint(event.pos):
                     return theatre_left()
+        render_inventory()
 
 
 def theatre_right():
@@ -703,8 +770,6 @@ def theatre_right():
     theatre_right_sprites.draw(screen)
     arrows_sprites.draw(screen)  # левая стрелка
     arrow_sprites.draw(screen)  # правая стрелка
-    for i in inventory:
-        globals()["inventory_sprites_" + i].draw(screen)
     while True:
         pygame.display.flip()
         for event in pygame.event.get():
@@ -715,8 +780,9 @@ def theatre_right():
                     return theatre_front()
                 elif right_arrow.rect.collidepoint(event.pos):
                     return theatre_back()
-                elif theatre_right_box.rect.collidepoint(event.pos):
+                elif theatre_right_box.rect.collidepoint(event.pos) and 'key' in inventory:
                     return show_theatre_right_box()
+        render_inventory()
 
 
 def show_theatre_right_box():
@@ -761,8 +827,13 @@ def show_theatre_right_box():
                         screen.blit(fon, (0, 0))
                         theatre_right_box_clock_arrows.draw(screen)
                         arro_sprites.draw(screen)
+                elif down_arrow.rect.collidepoint(event.pos) and first_code and \
+                        ('clock_arrows' in inventory or clock_arrows_set):
+                    inventory.remove('key')
+                    return theatre_right()
                 elif down_arrow.rect.collidepoint(event.pos):
                     return theatre_right()
+        render_inventory()
 
 
 def theatre_back():
@@ -771,8 +842,6 @@ def theatre_back():
     theatre_back_sprites.draw(screen)
     arrows_sprites.draw(screen)  # левая стрелка
     arrow_sprites.draw(screen)  # правая стрелка
-    for i in inventory:
-        globals()["inventory_sprites_" + i].draw(screen)
     while True:
         pygame.display.flip()
         for event in pygame.event.get():
@@ -787,6 +856,7 @@ def theatre_back():
                     return seat()
                 elif theatre_back_scene.rect.collidepoint(event.pos):
                     return board()
+        render_inventory()
 
 
 def seat():
@@ -802,6 +872,7 @@ def seat():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_arrow.rect.collidepoint(event.pos):
                     return theatre_back()
+        render_inventory()
 
 
 def board():
@@ -817,6 +888,7 @@ def board():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_arrow.rect.collidepoint(event.pos):
                     return theatre_back()
+        render_inventory()
 
 
 start_screen()
