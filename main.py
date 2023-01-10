@@ -847,7 +847,6 @@ def show_fertilizers():
                     inventory_sprites_fertilizers.draw(screen)
                     return theatre_right()
 
-
 def show_theatre_right_box():
     global first_code
     global clock_arrows_set
