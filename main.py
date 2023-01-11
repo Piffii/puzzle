@@ -15,6 +15,8 @@ second_code = False
 third_code = False
 fourth_code = False
 clock_arrows_set = False
+fertilizers_used = False
+box_key_used = False
 
 
 def load_image(name, colorkey=None):
@@ -65,12 +67,17 @@ box_inside_sprites = pygame.sprite.Group()  # лево внутри ящика
 inventory_sprites_coin = pygame.sprite.Group()
 inventory_sprites_code_second = pygame.sprite.Group()
 inventory_sprites_code_third = pygame.sprite.Group()
-inventory_sprites_code_fourth = pygame.sprite.Group()
+inventory_sprites_code_four = pygame.sprite.Group()
 inventory_sprites_scrap = pygame.sprite.Group()
 inventory_sprites_comedy = pygame.sprite.Group()
 inventory_sprites_water = pygame.sprite.Group()
 fertilizers_sprite = pygame.sprite.Group()
 inventory_sprites_fertilizers = pygame.sprite.Group()
+door_key_sprite = pygame.sprite.Group()
+inventory_sprites_door_key = pygame.sprite.Group()
+inventory_sprites_key_theatre_door = pygame.sprite.Group()
+code_three_sprites = pygame.sprite.Group()
+inventory_sprites_tragedy = pygame.sprite.Group()
 
 # спрайты мрамора
 marble_front_sprites = pygame.sprite.Group()
@@ -230,8 +237,15 @@ theatre_left_sprout = pygame.sprite.Sprite(theatre_left_sprites)
 theatre_left_sprout.image = load_image("theatre_left_sprout.png")
 theatre_left_sprout.image = pygame.transform.scale(theatre_left_sprout.image, (35, 54))
 theatre_left_sprout.rect = theatre_left_sprout.image.get_rect()
-theatre_left_sprout.rect.x = 215
+theatre_left_sprout.rect.x = 205
 theatre_left_sprout.rect.y = 257
+
+code_three = pygame.sprite.Sprite(code_three_sprites)
+code_three.image = load_image("code_two.png")
+code_three.image = pygame.transform.scale(code_three.image, (40, 40))
+code_three.rect = code_three.image.get_rect()
+code_three.rect.x = 250
+code_three.rect.y = 320
 
 theatre_left_clockface = pygame.sprite.Sprite(theatre_left_sprites)
 theatre_left_clockface.image = load_image("theatre_left_clockface.png")
@@ -246,6 +260,13 @@ clock_arrows_left.image = pygame.transform.scale(clock_arrows_left.image, (65, 5
 clock_arrows_left.rect = clock_arrows_left.image.get_rect()
 clock_arrows_left.rect.x = 384
 clock_arrows_left.rect.y = 134
+
+door_key = pygame.sprite.Sprite(door_key_sprite)
+door_key.image = load_image("key.png")
+door_key.image = pygame.transform.scale(door_key.image, (20, 45))
+door_key.rect = door_key.image.get_rect()
+door_key.rect.x = 220
+door_key.rect.y = 320
 # внутри часов
 scrap = pygame.sprite.Sprite(clock_box_inside_sprites)
 scrap.image = load_image("scrap.png")
@@ -422,30 +443,30 @@ inventory_clock_arrows.rect.y = 725
 
 inventory_code_first = pygame.sprite.Sprite(inventory_sprites_code_first)
 inventory_code_first.image = load_image("code_first.png")
-inventory_code_first.image = pygame.transform.scale(inventory_code_first.image, (50, 50))
+inventory_code_first.image = pygame.transform.scale(inventory_code_first.image, (35, 35))
 inventory_code_first.rect = inventory_code_first.image.get_rect()
 inventory_code_first.rect.x = 20
 inventory_code_first.rect.y = 200
 
 inventory_code_second = pygame.sprite.Sprite(inventory_sprites_code_second)
 inventory_code_second.image = load_image("code_two.png")
-inventory_code_second.image = pygame.transform.scale(inventory_code_second.image, (50, 50))
+inventory_code_second.image = pygame.transform.scale(inventory_code_second.image, (35, 35))
 inventory_code_second.rect = inventory_code_second.image.get_rect()
-inventory_code_second.rect.x = 90
+inventory_code_second.rect.x = 75
 inventory_code_second.rect.y = 200
 
-#inventory_code_third = pygame.sprite.Sprite(inventory_sprites_code_third)
-#inventory_code_third.image = load_image("code_third.png")
-#inventory_code_third.image = pygame.transform.scale(inventory_code_third.image, (50, 50))
-#inventory_code_third.rect = inventory_code_third.image.get_rect()
-#inventory_code_third.rect.x = 160
-#inventory_code_third.rect.y = 200
+inventory_code_third = pygame.sprite.Sprite(inventory_sprites_code_third)
+inventory_code_third.image = load_image("code_two.png")
+inventory_code_third.image = pygame.transform.scale(inventory_code_third.image, (35, 35))
+inventory_code_third.rect = inventory_code_third.image.get_rect()
+inventory_code_third.rect.x = 130
+inventory_code_third.rect.y = 200
 
-inventory_code_fourth = pygame.sprite.Sprite(inventory_sprites_code_fourth)
+inventory_code_fourth = pygame.sprite.Sprite(inventory_sprites_code_four)
 inventory_code_fourth.image = load_image("code_four.png")
-inventory_code_fourth.image = pygame.transform.scale(inventory_code_fourth.image, (50, 50))
+inventory_code_fourth.image = pygame.transform.scale(inventory_code_fourth.image, (35, 35))
 inventory_code_fourth.rect = inventory_code_fourth.image.get_rect()
-inventory_code_fourth.rect.x = 230
+inventory_code_fourth.rect.x = 185
 inventory_code_fourth.rect.y = 200
 
 
@@ -470,6 +491,13 @@ inventory_comedy.rect = inventory_comedy.image.get_rect()
 inventory_comedy.rect.x = 598
 inventory_comedy.rect.y = 709
 
+inventory_tragedy = pygame.sprite.Sprite(inventory_sprites_tragedy)
+inventory_tragedy.image = load_image("tragedy.png")
+inventory_tragedy.image = pygame.transform.scale(inventory_tragedy.image, (63, 83))
+inventory_tragedy.rect = inventory_tragedy.image.get_rect()
+inventory_tragedy.rect.x = 458
+inventory_tragedy.rect.y = 709
+
 inventory_water = pygame.sprite.Sprite(inventory_sprites_water)
 inventory_water.image = load_image("water.png")
 inventory_water.image = pygame.transform.scale(inventory_water.image, (65, 98))
@@ -483,6 +511,20 @@ inventory_fertilizers.image = pygame.transform.scale(inventory_fertilizers.image
 inventory_fertilizers.rect = inventory_fertilizers.image.get_rect()
 inventory_fertilizers.rect.x = 185
 inventory_fertilizers.rect.y = 818
+
+inventory_door_key = pygame.sprite.Sprite(inventory_sprites_door_key)
+inventory_door_key.image = load_image("key.png")
+inventory_door_key.image = pygame.transform.scale(inventory_door_key.image, (40, 90))
+inventory_door_key.rect = inventory_door_key.image.get_rect()
+inventory_door_key.rect.x = 330
+inventory_door_key.rect.y = 805
+
+inventory_key_theatre_door = pygame.sprite.Sprite(inventory_sprites_key_theatre_door)
+inventory_key_theatre_door.image = load_image("key_theatre_door.png")
+inventory_key_theatre_door.image = pygame.transform.scale(inventory_key_theatre_door.image, (40, 90))
+inventory_key_theatre_door.rect = inventory_key_theatre_door.image.get_rect()
+inventory_key_theatre_door.rect.x = 610
+inventory_key_theatre_door.rect.y = 805
 
 
 def terminate():
@@ -539,6 +581,11 @@ def show_rules():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if left_arrow.rect.collidepoint(event.pos):
                     return start_screen()
+
+
+def final_screen():
+    fon = pygame.transform.scale(load_image('the_end.png'), (WIDTH, HEIGHT))
+    screen.blit(fon, (0, 0))
 
 
 def render_inventory():
@@ -674,7 +721,7 @@ def theatre_front():
     if third_code:
         inventory_sprites_code_third.draw(screen)
     if fourth_code:
-        inventory_sprites_code_fourth.draw(screen)
+        inventory_sprites_code_four.draw(screen)
     while True:
         render_inventory()
         for event in pygame.event.get():
@@ -687,9 +734,15 @@ def theatre_front():
                     return theatre_right()
                 elif exit_button.rect.collidepoint(event.pos):
                     return select_level()
-                elif theatre_front_box.rect.collidepoint(event.pos):
+                elif theatre_front_door.rect.collidepoint(event.pos) and ('tragedy' and 'comedy') in inventory:
+                    inventory.remove('comedy')
+                    inventory.remove('tragedy')
+                    return final_screen()
+                elif theatre_front_box.rect.collidepoint(event.pos) and 'key_theatre_door' in inventory \
+                        and first_code and second_code and third_code and fourth_code:
                     return show_theatre_front_box()
-                elif theatre_front_hanger.rect.collidepoint(event.pos) and 'key' not in inventory:
+                elif theatre_front_hanger.rect.collidepoint(event.pos) and box_key_used is False \
+                        and 'key' not in inventory:
                     return show_key()
         pygame.display.flip()
 
@@ -707,7 +760,19 @@ def show_theatre_front_box():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_arrow.rect.collidepoint(event.pos):
+                    if len(show_theatre_front_box_sprites.sprites()) == 0:
+                        inventory.remove('key_theatre_door')
+                        screen.fill((255, 255, 255), (0, 700, 700, 200))
+                        render_inventory()
                     return theatre_front()
+                elif tragedy.rect.collidepoint(event.pos):
+                    tragedy.kill()
+                    screen.blit(fon, (0, 0))
+                    show_theatre_front_box_sprites.draw(screen)
+                    arro_sprites.draw(screen)
+                    inventory.append('tragedy')
+                    screen.fill((255, 255, 255), (0, 700, 700, 200))
+                    render_inventory()
 
 
 def show_key():
@@ -725,6 +790,7 @@ def show_key():
 
 
 def theatre_left():
+    global fertilizers_used
     global clock_arrows_set
     fon = pygame.transform.scale(load_image('theatre_left.png'), (700, 700))
     screen.blit(fon, (0, 0))
@@ -745,7 +811,7 @@ def theatre_left():
                     return theatre_front()
                 elif theatre_left_box.rect.collidepoint(event.pos) and clock_arrows_set:
                     return clock_box_inside()
-                elif theatre_left_door.rect.collidepoint(event.pos):
+                elif theatre_left_door.rect.collidepoint(event.pos) and 'door_key' in inventory:
                     return box_inside()
                 elif theatre_left_clockface.rect.collidepoint(event.pos) and 'clock_arrows' in inventory:
                     clock_arrows_set = True
@@ -756,7 +822,54 @@ def theatre_left():
                     arrows_sprites.draw(screen)  # левая стрелка
                     arrow_sprites.draw(screen)  # правая стрелка
                     theatre_left_clock_arrows.draw(screen)
+                elif theatre_left_sprout.rect.collidepoint(event.pos) and 'fertilizers' in inventory:
+                    inventory.remove('fertilizers')
+                    screen.fill((255, 255, 255), (0, 700, 700, 200))
+                    render_inventory()
+                    fertilizers_used = True
+                elif theatre_left_sprout.rect.collidepoint(event.pos) and fertilizers_used and 'water' in inventory:
+                    inventory.remove('water')
+                    screen.fill((255, 255, 255), (0, 700, 700, 200))
+                    render_inventory()
+                    spout_grow()
         render_inventory()
+
+
+def spout_grow():
+    global third_code
+    actions = 0
+    while True:
+        door_key_sprite.draw(screen)
+        code_three_sprites.draw(screen)
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if door_key.rect.collidepoint(event.pos):
+                    door_key.kill()
+                    screen.fill((255, 255, 255))
+                    screen.blit(pygame.transform.scale(load_image('theatre_left.png'), (700, 700)), (0, 0))
+                    theatre_left_sprites.draw(screen)
+                    theatre_left_clock_arrows.draw(screen)
+                    arrows_sprites.draw(screen)
+                    arrow_sprites.draw(screen)
+                    inventory.append('door_key')
+                    inventory_sprites_door_key.draw(screen)
+                    render_inventory()
+                    actions += 1
+                elif code_three.rect.collidepoint(event.pos):
+                    code_three.kill()
+                    screen.fill((255, 255, 255))
+                    screen.blit(pygame.transform.scale(load_image('theatre_left.png'), (700, 700)), (0, 0))
+                    theatre_left_sprites.draw(screen)
+                    theatre_left_clock_arrows.draw(screen)
+                    arrows_sprites.draw(screen)
+                    arrow_sprites.draw(screen)
+                    third_code = True
+                    actions += 1
+                if actions == 2:
+                    return theatre_left()
 
 
 def clock_box_inside():
@@ -795,6 +908,7 @@ def clock_box_inside():
 
 
 def box_inside():
+    global fourth_code
     fon = pygame.transform.scale(load_image('box_inside.png'), (700, 700))
     screen.blit(fon, (0, 0))
     box_inside_sprites.draw(screen)
@@ -806,7 +920,23 @@ def box_inside():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_arrow.rect.collidepoint(event.pos):
+                    if len(box_inside_sprites.sprites()) == 0:
+                        inventory.remove('door_key')
+                        screen.fill((255, 255, 255), (0, 700, 700, 200))
+                        render_inventory()
                     return theatre_left()
+                elif code_four.rect.collidepoint(event.pos):
+                    code_four.kill()
+                    screen.blit(fon, (0, 0))
+                    box_inside_sprites.draw(screen)
+                    arro_sprites.draw(screen)
+                    fourth_code = True
+                elif key_theatre_door.rect.collidepoint(event.pos):
+                    key_theatre_door.kill()
+                    screen.blit(fon, (0, 0))
+                    box_inside_sprites.draw(screen)
+                    arro_sprites.draw(screen)
+                    inventory.append('key_theatre_door')
         render_inventory()
 
 
@@ -831,6 +961,8 @@ def theatre_right():
                     return show_theatre_right_box()
                 elif theatre_right_crack.rect.collidepoint(event.pos) and 'coin' in inventory:
                     inventory.remove('coin')
+                    screen.fill((255, 255, 255), (0, 700, 700, 200))
+                    render_inventory()
                     show_fertilizers()
 
 
@@ -847,7 +979,9 @@ def show_fertilizers():
                     inventory_sprites_fertilizers.draw(screen)
                     return theatre_right()
 
+
 def show_theatre_right_box():
+    global box_key_used
     global first_code
     global clock_arrows_set
     fon = pygame.transform.scale(load_image('theatre_right_box_inside.png'), (700, 700))
@@ -892,6 +1026,9 @@ def show_theatre_right_box():
                 elif down_arrow.rect.collidepoint(event.pos) and first_code and \
                         ('clock_arrows' in inventory or clock_arrows_set):
                     inventory.remove('key')
+                    screen.fill((255, 255, 255), (0, 700, 700, 200))
+                    render_inventory()
+                    box_key_used = True
                     return theatre_right()
                 elif down_arrow.rect.collidepoint(event.pos):
                     return theatre_right()
