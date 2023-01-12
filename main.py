@@ -79,6 +79,8 @@ inventory_sprites_door_key = pygame.sprite.Group()
 inventory_sprites_key_theatre_door = pygame.sprite.Group()
 code_three_sprites = pygame.sprite.Group()
 inventory_sprites_tragedy = pygame.sprite.Group()
+# финал
+final_sprites = pygame.sprite.Group()
 
 # спрайты мрамора
 marble_front_sprites = pygame.sprite.Group()
@@ -365,17 +367,17 @@ marble_right_lattice.rect.y = 26
 # задняя часть театра
 theatre_back_seat = pygame.sprite.Sprite(theatre_back_sprites)
 theatre_back_seat.image = load_image("theatre_back_seats.png")
-theatre_back_seat.image = pygame.transform.scale(theatre_back_seat.image, (700, 530))
+theatre_back_seat.image = pygame.transform.scale(theatre_back_seat.image, (128, 80))
 theatre_back_seat.rect = theatre_back_seat.image.get_rect()
-theatre_back_seat.rect.x = 0
-theatre_back_seat.rect.y = 0
+theatre_back_seat.rect.x = 200
+theatre_back_seat.rect.y = 290
 
 theatre_back_scene = pygame.sprite.Sprite(theatre_back_sprites)
 theatre_back_scene.image = load_image("theatre_back_scene.png")
-theatre_back_scene.image = pygame.transform.scale(theatre_back_scene.image, (700, 333))
+theatre_back_scene.image = pygame.transform.scale(theatre_back_scene.image, (205, 74))
 theatre_back_scene.rect = theatre_back_scene.image.get_rect()
-theatre_back_scene.rect.x = 0
-theatre_back_scene.rect.y = 367
+theatre_back_scene.rect.x = 250
+theatre_back_scene.rect.y = 500
 
 water = pygame.sprite.Sprite(seat_sprites)
 water.image = load_image("water.png")
@@ -519,6 +521,56 @@ inventory_key_theatre_door.image = pygame.transform.scale(inventory_key_theatre_
 inventory_key_theatre_door.rect = inventory_key_theatre_door.image.get_rect()
 inventory_key_theatre_door.rect.x = 610
 inventory_key_theatre_door.rect.y = 805
+# конец
+return_button = pygame.sprite.Sprite(final_sprites)  # нужно добавить на финальное окно( оно возвражает на экран выбора)
+return_button.image = load_image("return_button.png")
+return_button.image = pygame.transform.scale(return_button.image, (111, 39))
+return_button.rect = return_button.image.get_rect()
+return_button.rect.x = 580
+return_button.rect.y = 850
+# мрамор дополнение
+biscuit = pygame.sprite.Sprite()  # печенье (нет спрайта)
+biscuit.image = load_image("biscuit.png")
+biscuit.image = pygame.transform.scale(biscuit.image, (54, 54))
+biscuit.rect = biscuit.image.get_rect()
+biscuit.rect.x = 0
+biscuit.rect.y = 0
+hammer = pygame.sprite.Sprite()  # молоток (нет спрайта)
+hammer.image = load_image("hammer.png")
+hammer.image = pygame.transform.scale(hammer.image, (270, 295))
+hammer.rect = hammer.image.get_rect()
+hammer.rect.x = 0
+hammer.rect.y = 0
+knife = pygame.sprite.Sprite()  # нож (нет спрайта)
+knife.image = load_image("knife.png")
+knife.image = pygame.transform.scale(knife.image, (248, 370))
+knife.rect = knife.image.get_rect()
+knife.rect.x = 0
+knife.rect.y = 0
+palette = pygame.sprite.Sprite()  # палитра (нет спрайта)
+palette.image = load_image("palette.png")
+palette.image = pygame.transform.scale(palette.image, (228, 231))
+palette.rect = palette.image.get_rect()
+palette.rect.x = 200
+palette.rect.y = 200
+broken_armchair = pygame.sprite.Sprite()  # сломаное кресло (нет спрайта)
+broken_armchair.image = load_image("broken_armchair.png")
+broken_armchair.image = pygame.transform.scale(broken_armchair.image, (259, 308))
+broken_armchair.rect = broken_armchair.image.get_rect()
+broken_armchair.rect.x = 50
+broken_armchair.rect.y = 392
+broken_pot = pygame.sprite.Sprite()  # сломаный горшок (нет спрайта)
+broken_pot.image = load_image("broken_pot.png")
+broken_pot.image = pygame.transform.scale(broken_pot.image, (209, 129))
+broken_pot.rect = broken_pot.image.get_rect()
+broken_pot.rect.x = 0
+broken_pot.rect.y = 0
+tree = pygame.sprite.Sprite()  # дерева (нет спрайта)
+tree.image = load_image("tree.png")
+tree.image = pygame.transform.scale(tree.image, (159, 233))
+tree.rect = tree.image.get_rect()
+tree.rect.x = 0
+tree.rect.y = 0
 
 
 def terminate():
