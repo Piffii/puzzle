@@ -1,6 +1,7 @@
 import pygame
 import sys
 import os
+import time
 
 
 pygame.init()
@@ -94,13 +95,6 @@ start_button.image = pygame.transform.scale(start_button.image, (WIDTH / 4, HEIG
 start_button.rect = start_button.image.get_rect()
 start_button.rect.x = WIDTH / 2 - WIDTH / 8
 start_button.rect.y = HEIGHT / 2 - HEIGHT / 18
-
-scores_button = pygame.sprite.Sprite(start_screen_sprites)
-scores_button.image = load_image("scores_button.png")
-scores_button.image = pygame.transform.scale(scores_button.image, (WIDTH / 4, HEIGHT / 9))
-scores_button.rect = scores_button.image.get_rect()
-scores_button.rect.x = WIDTH / 2 - WIDTH / 8
-scores_button.rect.y = (HEIGHT / 2 + HEIGHT / 3) - HEIGHT / 18
 
 rules_button = pygame.sprite.Sprite(start_screen_sprites)
 rules_button.image = load_image("rules_button.png")
@@ -734,7 +728,8 @@ def theatre_front():
                     return theatre_right()
                 elif exit_button.rect.collidepoint(event.pos):
                     return select_level()
-                elif theatre_front_door.rect.collidepoint(event.pos) and ('tragedy' and 'comedy') in inventory:
+                elif theatre_front_door.rect.collidepoint(event.pos) and 'tragedy' in inventory\
+                        and 'comedy' in inventory:
                     inventory.remove('comedy')
                     inventory.remove('tragedy')
                     return final_screen()
@@ -1109,11 +1104,11 @@ def board():
 
 
 start_screen()
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    clock.tick(FPS)
-    pygame.display.flip()
-pygame.quit()
+#running = True
+#while running:
+#    for event in pygame.event.get():
+#        if event.type == pygame.QUIT:
+#            running = False
+#    clock.tick(FPS)
+#    pygame.display.flip()
+#pygame.quit()
