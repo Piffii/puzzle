@@ -18,6 +18,8 @@ fourth_code = False
 clock_arrows_set = False
 fertilizers_used = False
 box_key_used = False
+theatre_start_time = 0
+theatre_end_time = 0
 
 
 def load_image(name, colorkey=None):
@@ -609,6 +611,7 @@ def select_level():
                     return start_screen()
                 elif theatre_button.rect.collidepoint(event.pos):
                     screen.fill((255, 255, 255))
+                    theatre_start_time = time.perf_counter()
                     theatre_front()
                 elif marble_button.rect.collidepoint(event.pos):
                     screen.fill((255, 255, 255))
@@ -630,8 +633,50 @@ def show_rules():
 
 
 def final_screen():
+    global theatre_start_time
+    global theatre_end_time
     fon = pygame.transform.scale(load_image('the_end.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 50)
+    text = font.render(f'Отлично! Твоё время прохождения:', True,
+                       (255, 255, 255))
+    text_x = WIDTH // 2 - text.get_width() // 2
+    text_y = HEIGHT // 2 - text.get_height() // 2
+    screen.blit(text, (text_x, text_y))
+    res_time_sec = round(theatre_end_time - theatre_start_time)
+    res_time_min = 0
+    res_time_hours = 0
+    if res_time_sec >= 60:
+        res_time_min = res_time_sec // 60
+        res_time_sec = res_time_sec % 60
+    if res_time_min >= 60:
+        res_time_hours = res_time_min // 60
+        res_time_min = res_time_min % 60
+    sec = ''
+    min = ''
+    hours = ''
+    if str(res_time_sec)[-1] in ['0', '5', '6', '7', '8', '9']:
+        sec = 'секунд'
+    elif str(res_time_sec)[-1] == '1':
+        sec = 'секунда'
+    else:
+        sec = 'секунды'
+    if str(res_time_min)[-1] in ['0', '5', '6', '7', '8', '9']:
+        min = 'минут'
+    elif str(res_time_min)[-1] == '1':
+        min = 'минута'
+    else:
+        min = 'минуты'
+    if str(res_time_hours)[-1] in ['0', '5', '6', '7', '8', '9']:
+        hour = 'часов'
+    elif str(res_time_hours)[-1] == '1':
+        hour = 'час'
+    else:
+        hour = 'часа'
+    number = font.render(f'{res_time_hours} {hour} {res_time_min} {min} {res_time_sec} {sec}', True, (255, 255, 255))
+    number_x = WIDTH // 2 - number.get_width() // 2
+    number_y = HEIGHT // 1.75 - number.get_height() // 2
+    screen.blit(number, (number_x, number_y))
 
 
 def render_inventory():
@@ -754,6 +799,7 @@ def theatre_front():
     global second_code
     global third_code
     global fourth_code
+    global theatre_end_time
     screen.fill((255, 255, 255))
     fon = pygame.transform.scale(load_image('theatre_front.png'), (700, 700))
     screen.blit(fon, (0, 0))
@@ -784,7 +830,8 @@ def theatre_front():
                         and 'comedy' in inventory:
                     inventory.remove('comedy')
                     inventory.remove('tragedy')
-                    return final_screen()
+                    theatre_end_time = time.perf_counter()
+                    final_screen()
                 elif theatre_front_box.rect.collidepoint(event.pos) and 'key_theatre_door' in inventory \
                         and first_code and second_code and third_code and fourth_code:
                     return show_theatre_front_box()
@@ -1152,15 +1199,9 @@ def board():
                     arrow_sprites.draw(screen)  # правая стрелка
                     board_sprites.draw(screen)
                     return theatre_back()
+                elif down_arrow.rect.collidepoint(event.pos):
+                    return theatre_back()
         render_inventory()
 
 
 start_screen()
-#running = True
-#while running:
-#    for event in pygame.event.get():
-#        if event.type == pygame.QUIT:
-#            running = False
-#    clock.tick(FPS)
-#    pygame.display.flip()
-#pygame.quit()
