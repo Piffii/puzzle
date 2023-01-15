@@ -156,6 +156,13 @@ rules_button.rect = rules_button.image.get_rect()
 rules_button.rect.x = WIDTH / 2 - WIDTH / 8
 rules_button.rect.y = (HEIGHT / 2 + HEIGHT / 6) - HEIGHT / 18
 
+exit = pygame.sprite.Sprite(start_screen_sprites)
+exit.image = load_image("exit.png")
+exit.image = pygame.transform.scale(exit.image, (WIDTH / 4, HEIGHT / 9))
+exit.rect = exit.image.get_rect()
+exit.rect.x = 262.5
+exit.rect.y = 700
+
 # левая стрелка
 left_arrow = pygame.sprite.Sprite(arrows_sprites)
 left_arrow.image = load_image("left_arrow.png")
@@ -692,7 +699,8 @@ def start_screen():
     fon = pygame.transform.scale(load_image('start_screen.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
     start_screen_sprites.draw(screen)
-    while True:
+    running = True
+    while running:
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -702,6 +710,9 @@ def start_screen():
                     return select_level()
                 elif rules_button.rect.collidepoint(event.pos):
                     return show_rules()
+                elif exit.rect.collidepoint(event.pos):
+                    running = False
+    pygame.quit()
 
 
 def select_level():
@@ -1024,7 +1035,6 @@ def render_inventory():
     for i in inventory:
         globals()["inventory_sprites_" + i].draw(screen)
 
-
 # Мрамор
 def marble_front():
     global knife_drawn
@@ -1269,7 +1279,6 @@ def bottom_box():
         bottombox_sprites.draw(screen)
         arro_sprites.draw(screen)
         render_inventory()
-
 
 # Театр
 def theatre_front():
