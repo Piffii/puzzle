@@ -1217,7 +1217,7 @@ def marble_back():
             kukuska_key_sprite.draw(screen)
         animated_sprite.draw(screen)
         kukushka.update()
-        clock.tick(15)
+        clock.tick(10)
         render_inventory()
 
 
