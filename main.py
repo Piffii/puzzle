@@ -2,9 +2,6 @@ import pygame
 import sys
 import os
 import time
-import psutil
-import logging
-
 
 pygame.init()
 FPS = 480
@@ -20,11 +17,42 @@ fourth_code = False
 clock_arrows_set = False
 fertilizers_used = False
 box_key_used = False
+start_time = 0
+end_time = 0
 theatre_start_time = 0
 theatre_end_time = 0
+marble_start_time = 0
+marble_end_time = 0
 theatre_level_completed = False
 marble_level_completed = False
 lattice_opened = False
+pot_broken = False
+knife_drawn = False
+armchair_broken = False
+kukushka_fed = False
+
+
+class AnimatedSprite(pygame.sprite.Sprite):
+    def __init__(self, sheet, columns, rows, x, y):
+        super().__init__(animated_sprite)
+        self.frames = []
+        self.cut_sheet(sheet, columns, rows)
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.rect = self.rect.move(x, y)
+
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+
+    def update(self):
+        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+        self.image = self.frames[self.cur_frame]
 
 
 def load_image(name, colorkey=None):
@@ -101,6 +129,17 @@ pillow_key_sprite = pygame.sprite.Group()
 inventory_sprites_screwdriver = pygame.sprite.Group()
 palette_sprite = pygame.sprite.Group()
 inventory_sprites_palette = pygame.sprite.Group()
+hammer_sprite = pygame.sprite.Group()
+inventory_sprites_hammer = pygame.sprite.Group()
+pot_key_sprite = pygame.sprite.Group()
+inventory_sprites_pot_key = pygame.sprite.Group()
+inventory_sprites_tassel = pygame.sprite.Group()
+knife_sprite = pygame.sprite.Group()
+inventory_sprites_knife = pygame.sprite.Group()
+biscuit_sprite = pygame.sprite.Group()
+inventory_sprites_biscuit = pygame.sprite.Group()
+animated_sprite = pygame.sprite.Group()
+kukuska_key_sprite = pygame.sprite.Group()
 
 # начальный экран
 start_button = pygame.sprite.Sprite(start_screen_sprites)
@@ -249,11 +288,11 @@ theatre_left_sprout.rect.x = 205
 theatre_left_sprout.rect.y = 257
 
 code_three = pygame.sprite.Sprite(code_three_sprites)
-code_three.image = load_image("code_two.png")
+code_three.image = load_image("code_three.png")
 code_three.image = pygame.transform.scale(code_three.image, (40, 40))
 code_three.rect = code_three.image.get_rect()
 code_three.rect.x = 250
-code_three.rect.y = 320
+code_three.rect.y = 230
 
 theatre_left_clockface = pygame.sprite.Sprite(theatre_left_sprites)
 theatre_left_clockface.image = load_image("theatre_left_clockface.png")
@@ -273,8 +312,8 @@ door_key = pygame.sprite.Sprite(door_key_sprite)
 door_key.image = load_image("key.png")
 door_key.image = pygame.transform.scale(door_key.image, (20, 45))
 door_key.rect = door_key.image.get_rect()
-door_key.rect.x = 220
-door_key.rect.y = 320
+door_key.rect.x = 200
+door_key.rect.y = 250
 # внутри часов
 scrap = pygame.sprite.Sprite(clock_box_inside_sprites)
 scrap.image = load_image("scrap.png")
@@ -383,6 +422,13 @@ pillow_key.rect = pillow_key.image.get_rect()
 pillow_key.rect.x = 430
 pillow_key.rect.y = 418
 
+pot_key = pygame.sprite.Sprite(pot_key_sprite)
+pot_key.image = load_image("key.png")
+pot_key.image = pygame.transform.scale(pot_key.image, (20, 45))
+pot_key.rect = pot_key.image.get_rect()
+pot_key.rect.x = 572
+pot_key.rect.y = 575
+
 # задняя часть театра
 theatre_back_seat = pygame.sprite.Sprite(theatre_back_sprites)
 theatre_back_seat.image = load_image("theatre_back_seats.png")
@@ -441,6 +487,13 @@ tassel.rect = tassel.image.get_rect()
 tassel.rect.x = 200
 tassel.rect.y = 250
 
+kukuska_key = pygame.sprite.Sprite(kukuska_key_sprite)
+kukuska_key.image = load_image("key_theatre_door.png")
+kukuska_key.image = pygame.transform.scale(kukuska_key.image, (25, 50))
+kukuska_key.rect = kukuska_key.image.get_rect()
+kukuska_key.rect.x = 125
+kukuska_key.rect.y = 245
+
 # инвентарь
 inventory_sprite = pygame.sprite.Sprite(inventory_sprite_background)
 inventory_sprite.image = load_image("inventory_sprite.png")
@@ -477,7 +530,7 @@ inventory_code_second.rect.x = 75
 inventory_code_second.rect.y = 200
 
 inventory_code_third = pygame.sprite.Sprite(inventory_sprites_code_third)
-inventory_code_third.image = load_image("code_two.png")
+inventory_code_third.image = load_image("code_three.png")
 inventory_code_third.image = pygame.transform.scale(inventory_code_third.image, (35, 35))
 inventory_code_third.rect = inventory_code_third.image.get_rect()
 inventory_code_third.rect.x = 130
@@ -561,6 +614,41 @@ inventory_palette.rect = inventory_palette.image.get_rect()
 inventory_palette.rect.x = 317
 inventory_palette.rect.y = 715
 
+inventory_hammer = pygame.sprite.Sprite(inventory_sprites_hammer)
+inventory_hammer.image = load_image("hammer.png")
+inventory_hammer.image = pygame.transform.scale(inventory_hammer.image, (63, 83))
+inventory_hammer.rect = inventory_hammer.image.get_rect()
+inventory_hammer.rect.x = 458
+inventory_hammer.rect.y = 709
+
+inventory_pot_key = pygame.sprite.Sprite(inventory_sprites_pot_key)
+inventory_pot_key.image = load_image("key.png")
+inventory_pot_key.image = pygame.transform.scale(inventory_pot_key.image, (40, 90))
+inventory_pot_key.rect = inventory_pot_key.image.get_rect()
+inventory_pot_key.rect.x = 598
+inventory_pot_key.rect.y = 709
+
+inventory_tassel = pygame.sprite.Sprite(inventory_sprites_tassel)
+inventory_tassel.image = load_image("tassel.png")
+inventory_tassel.image = pygame.transform.scale(inventory_tassel.image, (65, 98))
+inventory_tassel.rect = inventory_tassel.image.get_rect()
+inventory_tassel.rect.x = 38
+inventory_tassel.rect.y = 803
+
+inventory_knife = pygame.sprite.Sprite(inventory_sprites_knife)
+inventory_knife.image = load_image("knife.png")
+inventory_knife.image = pygame.transform.scale(inventory_knife.image, (52, 64))
+inventory_knife.rect = inventory_knife.image.get_rect()
+inventory_knife.rect.x = 185
+inventory_knife.rect.y = 818
+
+inventory_biscuit = pygame.sprite.Sprite(inventory_sprites_biscuit)
+inventory_biscuit.image = load_image("biscuit.png")
+inventory_biscuit.image = pygame.transform.scale(inventory_biscuit.image, (65, 65))
+inventory_biscuit.rect = inventory_biscuit.image.get_rect()
+inventory_biscuit.rect.x = 330
+inventory_biscuit.rect.y = 805
+
 # конец
 return_button = pygame.sprite.Sprite(final_sprites)  # нужно добавить на финальное окно( оно возвражает на экран выбора)
 return_button.image = load_image("return_button.png")
@@ -569,48 +657,30 @@ return_button.rect = return_button.image.get_rect()
 return_button.rect.x = 580
 return_button.rect.y = 850
 # мрамор дополнение
-biscuit = pygame.sprite.Sprite()  # печенье (нет спрайта)
+biscuit = pygame.sprite.Sprite(biscuit_sprite)  # печенье (нет спрайта)
 biscuit.image = load_image("biscuit.png")
-biscuit.image = pygame.transform.scale(biscuit.image, (54, 54))
+biscuit.image = pygame.transform.scale(biscuit.image, (44, 44))
 biscuit.rect = biscuit.image.get_rect()
-biscuit.rect.x = 0
-biscuit.rect.y = 0
-hammer = pygame.sprite.Sprite()  # молоток (нет спрайта)
+biscuit.rect.x = 165
+biscuit.rect.y = 525
+hammer = pygame.sprite.Sprite(hammer_sprite)  # молоток (нет спрайта)
 hammer.image = load_image("hammer.png")
-hammer.image = pygame.transform.scale(hammer.image, (270, 295))
+hammer.image = pygame.transform.scale(hammer.image, (57, 57))
 hammer.rect = hammer.image.get_rect()
-hammer.rect.x = 0
-hammer.rect.y = 0
-knife = pygame.sprite.Sprite()  # нож (нет спрайта)
+hammer.rect.x = 105
+hammer.rect.y = 35
+knife = pygame.sprite.Sprite(knife_sprite)  # нож (нет спрайта)
 knife.image = load_image("knife.png")
-knife.image = pygame.transform.scale(knife.image, (248, 370))
+knife.image = pygame.transform.scale(knife.image, (104, 165))
 knife.rect = knife.image.get_rect()
-knife.rect.x = 0
-knife.rect.y = 0
+knife.rect.x = 160
+knife.rect.y = 485
 palette = pygame.sprite.Sprite(palette_sprite)  # палитра (нет спрайта)
 palette.image = load_image("palette.png")
 palette.image = pygame.transform.scale(palette.image, (57, 57))
 palette.rect = palette.image.get_rect()
-palette.rect.x = 85
+palette.rect.x = 35
 palette.rect.y = 35
-broken_armchair = pygame.sprite.Sprite()  # сломаное кресло (нет спрайта)
-broken_armchair.image = load_image("broken_armchair.png")
-broken_armchair.image = pygame.transform.scale(broken_armchair.image, (259, 308))
-broken_armchair.rect = broken_armchair.image.get_rect()
-broken_armchair.rect.x = 50
-broken_armchair.rect.y = 392
-broken_pot = pygame.sprite.Sprite()  # сломаный горшок (нет спрайта)
-broken_pot.image = load_image("broken_pot.png")
-broken_pot.image = pygame.transform.scale(broken_pot.image, (209, 129))
-broken_pot.rect = broken_pot.image.get_rect()
-broken_pot.rect.x = 0
-broken_pot.rect.y = 0
-tree = pygame.sprite.Sprite()  # дерева (нет спрайта)
-tree.image = load_image("tree.png")
-tree.image = pygame.transform.scale(tree.image, (159, 233))
-tree.rect = tree.image.get_rect()
-tree.rect.x = 0
-tree.rect.y = 0
 
 
 def terminate():
@@ -635,6 +705,8 @@ def start_screen():
 
 
 def select_level():
+    global theatre_start_time
+    global marble_start_time
     fon = pygame.transform.scale(load_image('level_select.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
     select_level_sprites.draw(screen)
@@ -649,9 +721,11 @@ def select_level():
                     return start_screen()
                 elif theatre_button.rect.collidepoint(event.pos):
                     screen.fill((255, 255, 255))
+                    theatre_start_time = time.perf_counter()
                     theatre_front()
                 elif marble_button.rect.collidepoint(event.pos):
                     screen.fill((255, 255, 255))
+                    marble_start_time = time.perf_counter()
                     marble_front()
 
 
@@ -669,9 +743,12 @@ def show_rules():
                     return start_screen()
 
 
-def final_screen():
+def theatre_final_screen():
     global theatre_start_time
     global theatre_end_time
+    global theatre_level_completed
+    global marble_level_completed
+    global end_time
     fon = pygame.transform.scale(load_image('the_end.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
     final_sprites.draw(screen)
@@ -681,6 +758,193 @@ def final_screen():
     text_y = HEIGHT // 2 - text.get_height() // 2
     screen.blit(text, (text_x, text_y))
     res_time_sec = round(theatre_end_time - theatre_start_time)
+    res_time_min = 0
+    res_time_hours = 0
+    theatre_save_time(res_time_sec)
+    if res_time_sec >= 60:
+        res_time_min = res_time_sec // 60
+        res_time_sec = res_time_sec % 60
+    if res_time_min >= 60:
+        res_time_hours = res_time_min // 60
+        res_time_min = res_time_min % 60
+    if str(res_time_sec)[-1] in ['0', '5', '6', '7', '8', '9']:
+        sec = 'секунд'
+    elif str(res_time_sec)[-1] == '1':
+        sec = 'секунда'
+    else:
+        sec = 'секунды'
+    if str(res_time_min)[-1] in ['0', '5', '6', '7', '8', '9']:
+        min = 'минут'
+    elif str(res_time_min)[-1] == '1':
+        min = 'минута'
+    else:
+        min = 'минуты'
+    if str(res_time_hours)[-1] in ['0', '5', '6', '7', '8', '9']:
+        hour = 'часов'
+    elif str(res_time_hours)[-1] == '1':
+        hour = 'час'
+    else:
+        hour = 'часа'
+    number = font.render(f'{res_time_hours} {hour} {res_time_min} {min} {res_time_sec} {sec}', True, (255, 255, 255))
+    number_x = WIDTH // 2 - number.get_width() // 2
+    number_y = HEIGHT // 1.75 - number.get_height() // 2
+    screen.blit(number, (number_x, number_y))
+    with open('scores_theatre.txt', encoding='utf8', mode='rt') as file_read:
+        position = 0
+        count = 1
+        for i in file_read.readlines():
+            if str(res_time_sec) == i.rstrip('\n'):
+                position = count
+            else:
+                count += 1
+        file_read.close()
+    show_position = font.render(f'Ваш результат находится на {position} месте', True, (255, 255, 255))
+    show_position_x = WIDTH // 2 - show_position.get_width() // 2
+    show_position_y = HEIGHT // 1.5 - show_position.get_height() // 2
+    screen.blit(show_position, (show_position_x, show_position_y))
+
+    show_position_add = font.render(f'среди всего мира!', True, (255, 255, 255))
+    show_position_x_add = WIDTH // 2 - show_position_add.get_width() // 2
+    show_position_y_add = HEIGHT // 1.35 - show_position_add.get_height() // 2
+    screen.blit(show_position_add, (show_position_x_add, show_position_y_add))
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if return_button.rect.collidepoint(event.pos):
+                    if theatre_level_completed and marble_level_completed:
+                        end_time = time.perf_counter()
+                        final_screen()
+                    else:
+                        select_level()
+
+
+def theatre_save_time(time):
+    with open('scores_theatre.txt', encoding='utf8', mode='at') as file_add:
+        file_add.write(f'{time}\n')
+        file_add.close()
+    with open('scores_theatre.txt', encoding='utf8', mode='rt') as file_read:
+        results = list(map(int, file_read.readlines()))
+        file_read.close()
+    results.sort()
+    results = list(set(results))
+    with open('scores_theatre.txt', encoding='utf8', mode='wt') as file_write:
+        for i in results:
+            file_write.write(f'{i}\n')
+        file_write.close()
+
+
+def marble_final_screen():
+    global marble_start_time
+    global marble_end_time
+    global theatre_level_completed
+    global marble_level_completed
+    global end_time
+    fon = pygame.transform.scale(load_image('the_end.png'), (WIDTH, HEIGHT))
+    screen.blit(fon, (0, 0))
+    final_sprites.draw(screen)
+    font = pygame.font.Font(None, 50)
+    text = font.render(f'Отлично! Ваше время прохождения:', True, (255, 255, 255))
+    text_x = WIDTH // 2 - text.get_width() // 2
+    text_y = HEIGHT // 2 - text.get_height() // 2
+    screen.blit(text, (text_x, text_y))
+    res_time_sec = round(marble_end_time - marble_start_time)
+    res_time_min = 0
+    res_time_hours = 0
+    marble_save_time(res_time_sec)
+    if res_time_sec >= 60:
+        res_time_min = res_time_sec // 60
+        res_time_sec = res_time_sec % 60
+    if res_time_min >= 60:
+        res_time_hours = res_time_min // 60
+        res_time_min = res_time_min % 60
+    if str(res_time_sec)[-1] in ['0', '5', '6', '7', '8', '9']:
+        sec = 'секунд'
+    elif str(res_time_sec)[-1] == '1':
+        sec = 'секунда'
+    else:
+        sec = 'секунды'
+    if str(res_time_min)[-1] in ['0', '5', '6', '7', '8', '9']:
+        min = 'минут'
+    elif str(res_time_min)[-1] == '1':
+        min = 'минута'
+    else:
+        min = 'минуты'
+    if str(res_time_hours)[-1] in ['0', '5', '6', '7', '8', '9']:
+        hour = 'часов'
+    elif str(res_time_hours)[-1] == '1':
+        hour = 'час'
+    else:
+        hour = 'часа'
+    number = font.render(f'{res_time_hours} {hour} {res_time_min} {min} {res_time_sec} {sec}', True, (255, 255, 255))
+    number_x = WIDTH // 2 - number.get_width() // 2
+    number_y = HEIGHT // 1.75 - number.get_height() // 2
+    screen.blit(number, (number_x, number_y))
+    with open('scores_marble.txt', encoding='utf8', mode='rt') as file_read:
+        position = 0
+        count = 1
+        for i in file_read.readlines():
+            if str(res_time_sec) == i.rstrip('\n'):
+                position = count
+            else:
+                count += 1
+        file_read.close()
+    show_position = font.render(f'Ваш результат находится на {position} месте', True, (255, 255, 255))
+    show_position_x = WIDTH // 2 - show_position.get_width() // 2
+    show_position_y = HEIGHT // 1.5 - show_position.get_height() // 2
+    screen.blit(show_position, (show_position_x, show_position_y))
+
+    show_position_add = font.render(f'среди всего мира!', True, (255, 255, 255))
+    show_position_x_add = WIDTH // 2 - show_position_add.get_width() // 2
+    show_position_y_add = HEIGHT // 1.35 - show_position_add.get_height() // 2
+    screen.blit(show_position_add, (show_position_x_add, show_position_y_add))
+    while True:
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if return_button.rect.collidepoint(event.pos):
+                    if theatre_level_completed is True and marble_level_completed is True:
+                        end_time = time.perf_counter()
+                        final_screen()
+                    else:
+                        select_level()
+
+
+def marble_save_time(time):
+    with open('scores_marble.txt', encoding='utf8', mode='at') as file_add:
+        file_add.write(f'{time}\n')
+        file_add.close()
+    with open('scores_marble.txt', encoding='utf8', mode='rt') as file_read:
+        results = list(map(int, file_read.readlines()))
+        file_read.close()
+    results.sort()
+    results = list(set(results))
+    with open('scores_marble.txt', encoding='utf8', mode='wt') as file_write:
+        for i in results:
+            file_write.write(f'{i}\n')
+        file_write.close()
+
+
+def final_screen():
+    global start_time
+    global end_time
+    fon = pygame.transform.scale(load_image('the_end.png'), (WIDTH, HEIGHT))
+    screen.blit(fon, (0, 0))
+    final_sprites.draw(screen)
+    font = pygame.font.Font(None, 50)
+    text = font.render(f'Отлично! Вы прошли игру!', True, (255, 255, 255))
+    text_x = WIDTH // 2 - text.get_width() // 2
+    text_y = HEIGHT // 2 - text.get_height() // 2
+    screen.blit(text, (text_x, text_y))
+    text = font.render(f'И потратили всего:', True, (255, 255, 255))
+    text_x = WIDTH // 2 - text.get_width() // 2
+    text_y = HEIGHT // 1.75 - text.get_height() // 2
+    screen.blit(text, (text_x, text_y))
+    res_time_sec = round(end_time - start_time)
     res_time_min = 0
     res_time_hours = 0
     save_time(res_time_sec)
@@ -710,7 +974,7 @@ def final_screen():
         hour = 'часа'
     number = font.render(f'{res_time_hours} {hour} {res_time_min} {min} {res_time_sec} {sec}', True, (255, 255, 255))
     number_x = WIDTH // 2 - number.get_width() // 2
-    number_y = HEIGHT // 1.75 - number.get_height() // 2
+    number_y = HEIGHT // 1.6 - number.get_height() // 2
     screen.blit(number, (number_x, number_y))
     with open('scores.txt', encoding='utf8', mode='rt') as file_read:
         position = 0
@@ -723,12 +987,12 @@ def final_screen():
         file_read.close()
     show_position = font.render(f'Ваш результат находится на {position} месте', True, (255, 255, 255))
     show_position_x = WIDTH // 2 - show_position.get_width() // 2
-    show_position_y = HEIGHT // 1.5 - show_position.get_height() // 2
+    show_position_y = HEIGHT // 1.35 - show_position.get_height() // 2
     screen.blit(show_position, (show_position_x, show_position_y))
 
     show_position_add = font.render(f'среди всего мира!', True, (255, 255, 255))
     show_position_x_add = WIDTH // 2 - show_position_add.get_width() // 2
-    show_position_y_add = HEIGHT // 1.35 - show_position_add.get_height() // 2
+    show_position_y_add = HEIGHT // 1.25 - show_position_add.get_height() // 2
     screen.blit(show_position_add, (show_position_x_add, show_position_y_add))
     while True:
         pygame.display.flip()
@@ -737,7 +1001,7 @@ def final_screen():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if return_button.rect.collidepoint(event.pos):
-                    select_level()
+                    terminate()
 
 
 def save_time(time):
@@ -763,6 +1027,9 @@ def render_inventory():
 
 # Мрамор
 def marble_front():
+    global knife_drawn
+    global marble_end_time
+    global marble_level_completed
     fon = pygame.transform.scale(load_image('marble_front.png'), (700, 700))
     screen.blit(fon, (0, 0))
     marble_front_sprites.draw(screen)
@@ -780,9 +1047,33 @@ def marble_front():
                     return marble_right()
                 elif exit_button.rect.collidepoint(event.pos):
                     return select_level()
+                elif marble_front_painting.rect.collidepoint(event.pos) and 'palette' in inventory \
+                        and 'tassel' in inventory:
+                    knife_drawn = True
+                    inventory.remove('tassel')
+                    inventory.remove('palette')
+                elif knife.rect.collidepoint(event.pos) and knife_drawn:
+                    inventory.append('knife')
+                    knife.kill()
+                    render_inventory()
+                elif marble_front_door.rect.collidepoint(event.pos) and 'key_theatre_door' in inventory:
+                    inventory.clear()
+                    marble_end_time = time.perf_counter()
+                    marble_level_completed = True
+                    marble_final_screen()
+                elif marble_front_door.rect.collidepoint(event.pos) and marble_level_completed:
+                    select_level()
+        screen.blit(fon, (0, 0))
+        marble_front_sprites.draw(screen)
+        if knife_drawn:
+            knife_sprite.draw(screen)
+        arrows_sprites.draw(screen)
+        arrow_sprites.draw(screen)
+        render_inventory()
 
 
 def marble_right():
+    global pot_broken
     pillow_moved = False
     global lattice_opened
     fon = pygame.transform.scale(load_image('marble_right.png'), (700, 700))
@@ -790,6 +1081,7 @@ def marble_right():
     if lattice_opened is True:
         marble_right_lattice.rect.x = 216
     pillow_key_sprite.draw(screen)
+    hammer_sprite.draw(screen)
     palette_sprite.draw(screen)
     marble_right_sprites.draw(screen)
     arrows_sprites.draw(screen)  # левая стрелка
@@ -822,25 +1114,41 @@ def marble_right():
                     inventory.append('palette')
                     palette.kill()
                     render_inventory()
+                elif hammer.rect.collidepoint(event.pos) and lattice_opened:
+                    inventory.append('hammer')
+                    hammer.kill()
+                    render_inventory()
+                elif marble_right_pot.rect.collidepoint(event.pos) and 'hammer' in inventory:
+                    marble_right_pot.image = load_image('broken_pot.png')
+                    marble_right_pot.rect.x = 465
+                    pot_broken = True
+                    inventory.remove('hammer')
+                elif pot_key.rect.collidepoint(event.pos) and pot_broken:
+                    pot_key.kill()
+                    inventory.append('pot_key')
             if event.type == pygame.MOUSEMOTION:
                 if moving:
                     x_new = event.rel[0]
-                    if 400 >= marble_right_pillow.rect.x >= 290:
+                    if 460 >= marble_right_pillow.rect.x >= 290:
                         marble_right_pillow.rect.x = marble_right_pillow.rect.x + x_new
-                        if marble_right_pillow.rect.x <= 290:
+                        if 460 <= marble_right_pillow.rect.x or marble_right_pillow.rect.x <= 290:
                             pillow_moved = True
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 moving = False
         screen.blit(fon, (0, 0))
         pillow_key_sprite.draw(screen)
         palette_sprite.draw(screen)
+        hammer_sprite.draw(screen)
         marble_right_sprites.draw(screen)
+        if pot_broken:
+            pot_key_sprite.draw(screen)
         arrows_sprites.draw(screen)
         arrow_sprites.draw(screen)
         render_inventory()
 
 
 def marble_left():
+    global armchair_broken
     fon = pygame.transform.scale(load_image('marble_left.png'), (700, 700))
     screen.blit(fon, (0, 0))
     marble_left_sprites.draw(screen)
@@ -856,14 +1164,31 @@ def marble_left():
                     return marble_back()
                 elif right_arrow.rect.collidepoint(event.pos):
                     return marble_front()
+                elif marble_left_armchair.rect.collidepoint(event.pos) and 'knife' in inventory:
+                    inventory.remove('knife')
+                    marble_left_armchair.image = load_image('broken_armchair.png')
+                    marble_left_armchair.image = pygame.transform.scale(marble_left_armchair.image, (259, 308))
+                    armchair_broken = True
+                elif biscuit.rect.collidepoint(event.pos) and armchair_broken:
+                    inventory.append('biscuit')
+                    biscuit.kill()
+        screen.blit(fon, (0, 0))
+        marble_left_sprites.draw(screen)
+        arrows_sprites.draw(screen)
+        arrow_sprites.draw(screen)
+        if armchair_broken:
+            biscuit_sprite.draw(screen)
+        render_inventory()
 
 
 def marble_back():
+    global kukushka_fed
     fon = pygame.transform.scale(load_image('marble_back.png'), (700, 700))
     screen.blit(fon, (0, 0))
     marble_back_sprites.draw(screen)
     arrows_sprites.draw(screen)  # левая стрелка
     arrow_sprites.draw(screen)  # правая стрелка
+    kukushka = AnimatedSprite(load_image("animation.png"), 11, 2, 100, 180)
     while True:
         pygame.display.flip()
         for event in pygame.event.get():
@@ -876,8 +1201,24 @@ def marble_back():
                     return marble_left()
                 elif marble_back_topbox.rect.collidepoint(event.pos) and 'key' in inventory:
                     return top_box()
-                elif marble_back_bottombox.rect.collidepoint(event.pos):
+                elif marble_back_bottombox.rect.collidepoint(event.pos) and 'pot_key' in inventory:
                     return bottom_box()
+                elif kukushka.rect.collidepoint(event.pos) and 'biscuit' in inventory:
+                    inventory.remove('biscuit')
+                    kukushka_fed = True
+                elif kukuska_key.rect.collidepoint(event.pos) and kukushka_fed:
+                    inventory.append('key_theatre_door')
+                    kukuska_key.kill()
+        screen.blit(fon, (0, 0))
+        marble_back_sprites.draw(screen)
+        arrows_sprites.draw(screen)  # левая стрелка
+        arrow_sprites.draw(screen)  # правая стрелка
+        if kukushka_fed:
+            kukuska_key_sprite.draw(screen)
+        animated_sprite.draw(screen)
+        kukushka.update()
+        clock.tick(15)
+        render_inventory()
 
 
 def top_box():
@@ -917,7 +1258,17 @@ def bottom_box():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_arrow.rect.collidepoint(event.pos):
+                    if 'tassel' in inventory:
+                        inventory.remove('pot_key')
+                        render_inventory()
                     return marble_back()
+                elif tassel.rect.collidepoint(event.pos):
+                    inventory.append('tassel')
+                    tassel.kill()
+        screen.blit(fon, (0, 0))
+        bottombox_sprites.draw(screen)
+        arro_sprites.draw(screen)
+        render_inventory()
 
 
 # Театр
@@ -955,15 +1306,14 @@ def theatre_front():
                 elif exit_button.rect.collidepoint(event.pos):
                     select_level()
                 elif theatre_front_door.rect.collidepoint(event.pos) and 'tragedy' in inventory\
-                        and 'comedy' in inventory:
-                    inventory.remove('comedy')
-                    inventory.remove('tragedy')
+                        and 'comedy' in inventory and 'key_theatre_door' in inventory:
+                    inventory.clear()
                     theatre_end_time = time.perf_counter()
                     theatre_level_completed = True
-                    final_screen()
+                    theatre_final_screen()
                 elif theatre_level_completed and theatre_front_door.rect.collidepoint(event.pos):
                     select_level()
-                elif theatre_front_box.rect.collidepoint(event.pos) and 'key_theatre_door' in inventory \
+                elif theatre_front_box.rect.collidepoint(event.pos) \
                         and first_code and second_code and third_code and fourth_code:
                     return show_theatre_front_box()
                 elif theatre_front_hanger.rect.collidepoint(event.pos) and box_key_used is False \
@@ -985,9 +1335,6 @@ def show_theatre_front_box():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_arrow.rect.collidepoint(event.pos):
-                    if len(show_theatre_front_box_sprites.sprites()) == 0:
-                        inventory.remove('key_theatre_door')
-                        render_inventory()
                     return theatre_front()
                 elif tragedy.rect.collidepoint(event.pos):
                     tragedy.kill()
@@ -1051,6 +1398,14 @@ def theatre_left():
                     fertilizers_used = True
                 elif theatre_left_sprout.rect.collidepoint(event.pos) and fertilizers_used and 'water' in inventory:
                     inventory.remove('water')
+                    theatre_left_sprout.image = load_image('tree.png')
+                    theatre_left_sprout.rect.x -= 50
+                    theatre_left_sprout.rect.y -= 105
+                    screen.blit(fon, (0, 0))
+                    theatre_left_sprites.draw(screen)
+                    arrows_sprites.draw(screen)
+                    arrow_sprites.draw(screen)
+                    theatre_left_clock_arrows.draw(screen)
                     render_inventory()
                     spout_grow()
         render_inventory()
@@ -1088,6 +1443,7 @@ def spout_grow():
                     arrows_sprites.draw(screen)
                     arrow_sprites.draw(screen)
                     third_code = True
+                    render_inventory()
                     actions += 1
                 if actions == 2:
                     return theatre_left()
@@ -1329,4 +1685,5 @@ def board():
 
 
 if __name__ == '__main__':
+    start_time = time.perf_counter()
     start_screen()
