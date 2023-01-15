@@ -82,6 +82,7 @@ select_level_sprites = pygame.sprite.Group()
 arrows_sprites = pygame.sprite.Group()  # левая стрелка
 arrow_sprites = pygame.sprite.Group()  # правая стрелка
 arro_sprites = pygame.sprite.Group()  # стрелка вниз
+white_arro_sprites = pygame.sprite.Group()  # белая стрелка вниз
 # спрайты театра
 theatre_front_sprites = pygame.sprite.Group()  # перед
 theatre_left_sprites = pygame.sprite.Group()  # лево
@@ -183,6 +184,12 @@ down_arrow.image = load_image("down_arrow.png")
 down_arrow.rect = down_arrow.image.get_rect()
 down_arrow.rect.x = 350
 down_arrow.rect.y = 653
+
+down_white_arro = pygame.sprite.Sprite(white_arro_sprites)
+down_white_arro.image = load_image("down_white_arro.png")
+down_white_arro.rect = down_white_arro.image.get_rect()
+down_white_arro.rect.x = 350
+down_white_arro.rect.y = 653
 
 # запуск театра
 theatre_button = pygame.sprite.Sprite(select_level_sprites)
@@ -648,6 +655,7 @@ inventory_knife.image = pygame.transform.scale(inventory_knife.image, (52, 64))
 inventory_knife.rect = inventory_knife.image.get_rect()
 inventory_knife.rect.x = 185
 inventory_knife.rect.y = 818
+down_arrow
 
 inventory_biscuit = pygame.sprite.Sprite(inventory_sprites_biscuit)
 inventory_biscuit.image = load_image("biscuit.png")
@@ -699,8 +707,7 @@ def start_screen():
     fon = pygame.transform.scale(load_image('start_screen.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
     start_screen_sprites.draw(screen)
-    running = True
-    while running:
+    while True:
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -711,8 +718,7 @@ def start_screen():
                 elif rules_button.rect.collidepoint(event.pos):
                     return show_rules()
                 elif exit.rect.collidepoint(event.pos):
-                    running = False
-    pygame.quit()
+                    sys.exit()
 
 
 def select_level():
@@ -1235,14 +1241,14 @@ def top_box():
     fon = pygame.transform.scale(load_image('marble_top_box.png'), (700, 700))
     screen.blit(fon, (0, 0))
     topbox_sprites.draw(screen)
-    arro_sprites.draw(screen)
+    white_arro_sprites.draw(screen)
     while True:
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if down_arrow.rect.collidepoint(event.pos):
+                if down_white_arro.rect.collidepoint(event.pos):
                     if 'screwdriver' in inventory:
                         inventory.remove('key')
                         render_inventory()
@@ -1252,7 +1258,7 @@ def top_box():
                     screwdriver.kill()
         screen.blit(fon, (0, 0))
         topbox_sprites.draw(screen)
-        arro_sprites.draw(screen)
+        white_arro_sprites.draw(screen)
         render_inventory()
 
 
@@ -1260,14 +1266,14 @@ def bottom_box():
     fon = pygame.transform.scale(load_image('marble_bottom_box.png'), (700, 700))
     screen.blit(fon, (0, 0))
     bottombox_sprites.draw(screen)
-    arro_sprites.draw(screen)
+    white_arro_sprites.draw(screen)
     while True:
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if down_arrow.rect.collidepoint(event.pos):
+                if down_white_arro.rect.collidepoint(event.pos):
                     if 'tassel' in inventory:
                         inventory.remove('pot_key')
                         render_inventory()
@@ -1277,7 +1283,7 @@ def bottom_box():
                     tassel.kill()
         screen.blit(fon, (0, 0))
         bottombox_sprites.draw(screen)
-        arro_sprites.draw(screen)
+        white_arro_sprites.draw(screen)
         render_inventory()
 
 # Театр
