@@ -7,7 +7,7 @@ import logging
 
 
 pygame.init()
-FPS = 500
+FPS = 480
 size = WIDTH, HEIGHT = 700, 900
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Мистер Банеееейн, Mr. Bannaaaame')
@@ -22,8 +22,9 @@ fertilizers_used = False
 box_key_used = False
 theatre_start_time = 0
 theatre_end_time = 0
-theatre_level_complited = False
-marble_level_complited = False
+theatre_level_completed = False
+marble_level_completed = False
+lattice_opened = False
 
 
 def load_image(name, colorkey=None):
@@ -96,6 +97,10 @@ marble_left_sprites = pygame.sprite.Group()
 marble_back_sprites = pygame.sprite.Group()
 bottombox_sprites = pygame.sprite.Group()
 topbox_sprites = pygame.sprite.Group()
+pillow_key_sprite = pygame.sprite.Group()
+inventory_sprites_screwdriver = pygame.sprite.Group()
+palette_sprite = pygame.sprite.Group()
+inventory_sprites_palette = pygame.sprite.Group()
 
 # начальный экран
 start_button = pygame.sprite.Sprite(start_screen_sprites)
@@ -371,6 +376,13 @@ marble_right_lattice.rect = marble_right_lattice.image.get_rect()
 marble_right_lattice.rect.x = 6
 marble_right_lattice.rect.y = 26
 
+pillow_key = pygame.sprite.Sprite(pillow_key_sprite)
+pillow_key.image = load_image("key.png")
+pillow_key.image = pygame.transform.scale(pillow_key.image, (20, 45))
+pillow_key.rect = pillow_key.image.get_rect()
+pillow_key.rect.x = 430
+pillow_key.rect.y = 418
+
 # задняя часть театра
 theatre_back_seat = pygame.sprite.Sprite(theatre_back_sprites)
 theatre_back_seat.image = load_image("theatre_back_seats.png")
@@ -488,9 +500,9 @@ inventory_coin.rect.y = 715
 
 inventory_scrap = pygame.sprite.Sprite(inventory_sprites_scrap)
 inventory_scrap.image = load_image("scrap.png")
-inventory_scrap.image = pygame.transform.scale(inventory_scrap.image, (95, 116))
+inventory_scrap.image = pygame.transform.scale(inventory_scrap.image, (83, 100))
 inventory_scrap.rect = inventory_scrap.image.get_rect()
-inventory_scrap.rect.x = 443
+inventory_scrap.rect.x = 153
 inventory_scrap.rect.y = 700
 
 inventory_comedy = pygame.sprite.Sprite(inventory_sprites_comedy)
@@ -534,6 +546,21 @@ inventory_key_theatre_door.image = pygame.transform.scale(inventory_key_theatre_
 inventory_key_theatre_door.rect = inventory_key_theatre_door.image.get_rect()
 inventory_key_theatre_door.rect.x = 610
 inventory_key_theatre_door.rect.y = 805
+
+inventory_screwdriver = pygame.sprite.Sprite(inventory_sprites_screwdriver)
+inventory_screwdriver.image = load_image("screwdriver.png")
+inventory_screwdriver.image = pygame.transform.scale(inventory_screwdriver.image, (77, 73))
+inventory_screwdriver.rect = inventory_screwdriver.image.get_rect()
+inventory_screwdriver.rect.x = 153
+inventory_screwdriver.rect.y = 725
+
+inventory_palette = pygame.sprite.Sprite(inventory_sprites_palette)
+inventory_palette.image = load_image("palette.png")
+inventory_palette.image = pygame.transform.scale(inventory_palette.image, (77, 73))
+inventory_palette.rect = inventory_palette.image.get_rect()
+inventory_palette.rect.x = 317
+inventory_palette.rect.y = 715
+
 # конец
 return_button = pygame.sprite.Sprite(final_sprites)  # нужно добавить на финальное окно( оно возвражает на экран выбора)
 return_button.image = load_image("return_button.png")
@@ -560,12 +587,12 @@ knife.image = pygame.transform.scale(knife.image, (248, 370))
 knife.rect = knife.image.get_rect()
 knife.rect.x = 0
 knife.rect.y = 0
-palette = pygame.sprite.Sprite()  # палитра (нет спрайта)
+palette = pygame.sprite.Sprite(palette_sprite)  # палитра (нет спрайта)
 palette.image = load_image("palette.png")
-palette.image = pygame.transform.scale(palette.image, (228, 231))
+palette.image = pygame.transform.scale(palette.image, (57, 57))
 palette.rect = palette.image.get_rect()
-palette.rect.x = 200
-palette.rect.y = 200
+palette.rect.x = 85
+palette.rect.y = 35
 broken_armchair = pygame.sprite.Sprite()  # сломаное кресло (нет спрайта)
 broken_armchair.image = load_image("broken_armchair.png")
 broken_armchair.image = pygame.transform.scale(broken_armchair.image, (259, 308))
@@ -756,17 +783,21 @@ def marble_front():
 
 
 def marble_right():
+    pillow_moved = False
+    global lattice_opened
     fon = pygame.transform.scale(load_image('marble_right.png'), (700, 700))
     screen.blit(fon, (0, 0))
+    if lattice_opened is True:
+        marble_right_lattice.rect.x = 216
+    pillow_key_sprite.draw(screen)
+    palette_sprite.draw(screen)
     marble_right_sprites.draw(screen)
     arrows_sprites.draw(screen)  # левая стрелка
     arrow_sprites.draw(screen)  # правая стрелка
-    falling = False
-    running, moving = True, False
+    moving = False
     marble_right_pillow.rect = marble_right_pillow.image.get_rect()
     marble_right_pillow.rect.x = 400
     marble_right_pillow.rect.y = 405
-    x_old, y_old, x_new, y_new = 0, 0, 0, 0
     while True:
         pygame.display.flip()
         for event in pygame.event.get():
@@ -779,21 +810,30 @@ def marble_right():
                     moving = True
                 elif right_arrow.rect.collidepoint(event.pos):
                     return marble_back()
+                elif pillow_key.rect.collidepoint(event.pos) and pillow_moved:
+                    inventory.append('key')
+                    pillow_key.kill()
+                elif marble_right_lattice.rect.collidepoint(event.pos) and 'screwdriver' in inventory:
+                    marble_right_lattice.rect.x += 210
+                    lattice_opened = True
+                    inventory.remove('screwdriver')
+                    render_inventory()
+                elif palette.rect.collidepoint(event.pos) and lattice_opened:
+                    inventory.append('palette')
+                    palette.kill()
+                    render_inventory()
             if event.type == pygame.MOUSEMOTION:
                 if moving:
-                    falling = False
-                    x_new, y_new = event.rel
-                    marble_right_pillow.rect.x, marble_right_pillow.rect.y =\
-                        marble_right_pillow.rect.x + x_new, marble_right_pillow.rect.y + y_new
+                    x_new = event.rel[0]
+                    if 400 >= marble_right_pillow.rect.x >= 290:
+                        marble_right_pillow.rect.x = marble_right_pillow.rect.x + x_new
+                        if marble_right_pillow.rect.x <= 290:
+                            pillow_moved = True
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 moving = False
-                if marble_right_pillow.rect.y != 405:
-                    falling = True
-        if falling is True and marble_right_pillow.rect.y < 635:
-            marble_right_pillow.rect.y += 1
-            marble_right_sprites.draw(screen)
-            clock.tick(FPS)
         screen.blit(fon, (0, 0))
+        pillow_key_sprite.draw(screen)
+        palette_sprite.draw(screen)
         marble_right_sprites.draw(screen)
         arrows_sprites.draw(screen)
         arrow_sprites.draw(screen)
@@ -834,7 +874,7 @@ def marble_back():
                     return marble_right()
                 elif right_arrow.rect.collidepoint(event.pos):
                     return marble_left()
-                elif marble_back_topbox.rect.collidepoint(event.pos):
+                elif marble_back_topbox.rect.collidepoint(event.pos) and 'key' in inventory:
                     return top_box()
                 elif marble_back_bottombox.rect.collidepoint(event.pos):
                     return bottom_box()
@@ -852,7 +892,17 @@ def top_box():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_arrow.rect.collidepoint(event.pos):
+                    if 'screwdriver' in inventory:
+                        inventory.remove('key')
+                        render_inventory()
                     return marble_back()
+                elif screwdriver.rect.collidepoint(event.pos):
+                    inventory.append('screwdriver')
+                    screwdriver.kill()
+        screen.blit(fon, (0, 0))
+        topbox_sprites.draw(screen)
+        arro_sprites.draw(screen)
+        render_inventory()
 
 
 def bottom_box():
@@ -877,7 +927,7 @@ def theatre_front():
     global third_code
     global fourth_code
     global theatre_end_time
-    global theatre_level_complited
+    global theatre_level_completed
     screen.fill((255, 255, 255))
     fon = pygame.transform.scale(load_image('theatre_front.png'), (700, 700))
     screen.blit(fon, (0, 0))
@@ -909,9 +959,9 @@ def theatre_front():
                     inventory.remove('comedy')
                     inventory.remove('tragedy')
                     theatre_end_time = time.perf_counter()
-                    theatre_level_complited = True
+                    theatre_level_completed = True
                     final_screen()
-                elif theatre_level_complited and theatre_front_door.rect.collidepoint(event.pos):
+                elif theatre_level_completed and theatre_front_door.rect.collidepoint(event.pos):
                     select_level()
                 elif theatre_front_box.rect.collidepoint(event.pos) and 'key_theatre_door' in inventory \
                         and first_code and second_code and third_code and fourth_code:
