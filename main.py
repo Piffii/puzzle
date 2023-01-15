@@ -518,8 +518,8 @@ kukuska_key = pygame.sprite.Sprite(kukuska_key_sprite)
 kukuska_key.image = load_image("key_theatre_door.png")
 kukuska_key.image = pygame.transform.scale(kukuska_key.image, (25, 50))
 kukuska_key.rect = kukuska_key.image.get_rect()
-kukuska_key.rect.x = 125
-kukuska_key.rect.y = 245
+kukuska_key.rect.x = 120
+kukuska_key.rect.y = 325
 
 # инвентарь
 inventory_sprite = pygame.sprite.Sprite(inventory_sprite_background)
@@ -1246,7 +1246,7 @@ def marble_back():
     marble_back_sprites.draw(screen)
     arrows_sprites.draw(screen)  # левая стрелка
     arrow_sprites.draw(screen)  # правая стрелка
-    kukushka = AnimatedSprite(load_image("animation.png"), 11, 2, 100, 180)
+    kukushka = AnimatedSprite(load_image("animation.png"), 11, 2, 100, 230)
     while True:
         pygame.display.flip()
         for event in pygame.event.get():
