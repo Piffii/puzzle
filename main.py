@@ -9,7 +9,8 @@ size = WIDTH, HEIGHT = 700, 900
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Мистер Банеееейн, Mr. Bannaaaame')
 clock = pygame.time.Clock()
-inventory = []
+theatre_inventory = []
+marble_inventory = []
 first_code = False
 second_code = False
 third_code = False
@@ -30,6 +31,18 @@ pot_broken = False
 knife_drawn = False
 armchair_broken = False
 kukushka_fed = False
+tassel_used = False
+palette_used = False
+knife_used = False
+key_used = False
+screwdriver_used = False
+hammer_used = False
+pot_key_used = False
+biscuit_used = False
+key_theatre_door_used = False
+water_used = False
+coin_used = False
+scrap_used = False
 
 
 class AnimatedSprite(pygame.sprite.Sprite):
@@ -655,7 +668,6 @@ inventory_knife.image = pygame.transform.scale(inventory_knife.image, (52, 64))
 inventory_knife.rect = inventory_knife.image.get_rect()
 inventory_knife.rect.x = 185
 inventory_knife.rect.y = 818
-down_arrow
 
 inventory_biscuit = pygame.sprite.Sprite(inventory_sprites_biscuit)
 inventory_biscuit.image = load_image("biscuit.png")
@@ -807,7 +819,7 @@ def theatre_final_screen():
     number_y = HEIGHT // 1.75 - number.get_height() // 2
     screen.blit(number, (number_x, number_y))
     with open('scores_theatre.txt', encoding='utf8', mode='rt') as file_read:
-        position = 0
+        position = 1
         count = 1
         for i in file_read.readlines():
             if str(res_time_sec) == i.rstrip('\n'):
@@ -843,12 +855,12 @@ def theatre_save_time(time):
         file_add.write(f'{time}\n')
         file_add.close()
     with open('scores_theatre.txt', encoding='utf8', mode='rt') as file_read:
-        results = list(map(int, file_read.readlines()))
+        theatre_results = list(map(int, file_read.readlines()))
         file_read.close()
-    results.sort()
-    results = list(set(results))
+    theatre_results.sort()
+    theatre_results = list(set(theatre_results))
     with open('scores_theatre.txt', encoding='utf8', mode='wt') as file_write:
-        for i in results:
+        for i in theatre_results:
             file_write.write(f'{i}\n')
         file_write.close()
 
@@ -936,12 +948,12 @@ def marble_save_time(time):
         file_add.write(f'{time}\n')
         file_add.close()
     with open('scores_marble.txt', encoding='utf8', mode='rt') as file_read:
-        results = list(map(int, file_read.readlines()))
+        marble_results = list(map(int, file_read.readlines()))
         file_read.close()
-    results.sort()
-    results = list(set(results))
+    marble_results.sort()
+    marble_results = list(set(marble_results))
     with open('scores_marble.txt', encoding='utf8', mode='wt') as file_write:
-        for i in results:
+        for i in marble_results:
             file_write.write(f'{i}\n')
         file_write.close()
 
@@ -1018,7 +1030,7 @@ def final_screen():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if return_button.rect.collidepoint(event.pos):
-                    terminate()
+                    start_screen()
 
 
 def save_time(time):
@@ -1036,16 +1048,26 @@ def save_time(time):
         file_write.close()
 
 
-def render_inventory():
+def render_theatre_inventory():
     inventory_sprite_background.draw(screen)
-    for i in inventory:
+    for i in theatre_inventory:
         globals()["inventory_sprites_" + i].draw(screen)
+
+
+def render_marble_inventory():
+    inventory_sprite_background.draw(screen)
+    for i in marble_inventory:
+        globals()["inventory_sprites_" + i].draw(screen)
+
 
 # Мрамор
 def marble_front():
     global knife_drawn
     global marble_end_time
     global marble_level_completed
+    global tassel_used
+    global palette_used
+    global knife_used
     fon = pygame.transform.scale(load_image('marble_front.png'), (700, 700))
     screen.blit(fon, (0, 0))
     marble_front_sprites.draw(screen)
@@ -1063,17 +1085,20 @@ def marble_front():
                     return marble_right()
                 elif exit_button.rect.collidepoint(event.pos):
                     return select_level()
-                elif marble_front_painting.rect.collidepoint(event.pos) and 'palette' in inventory \
-                        and 'tassel' in inventory:
+                elif marble_front_painting.rect.collidepoint(event.pos) and 'palette' in marble_inventory \
+                        and 'tassel' in marble_inventory:
                     knife_drawn = True
-                    inventory.remove('tassel')
-                    inventory.remove('palette')
-                elif knife.rect.collidepoint(event.pos) and knife_drawn:
-                    inventory.append('knife')
+                    marble_inventory.remove('tassel')
+                    marble_inventory.remove('palette')
+                    tassel_used = True
+                    palette_used = True
+                elif knife.rect.collidepoint(event.pos) and knife_drawn and 'knife' not in marble_inventory\
+                        and not knife_used:
+                    marble_inventory.append('knife')
                     knife.kill()
-                    render_inventory()
-                elif marble_front_door.rect.collidepoint(event.pos) and 'key_theatre_door' in inventory:
-                    inventory.clear()
+                    render_marble_inventory()
+                elif marble_front_door.rect.collidepoint(event.pos) and 'key_theatre_door' in marble_inventory:
+                    marble_inventory.clear()
                     marble_end_time = time.perf_counter()
                     marble_level_completed = True
                     marble_final_screen()
@@ -1085,13 +1110,18 @@ def marble_front():
             knife_sprite.draw(screen)
         arrows_sprites.draw(screen)
         arrow_sprites.draw(screen)
-        render_inventory()
+        render_marble_inventory()
 
 
 def marble_right():
     global pot_broken
     pillow_moved = False
     global lattice_opened
+    global key_used
+    global screwdriver_used
+    global palette_used
+    global hammer_used
+    global pot_key_used
     fon = pygame.transform.scale(load_image('marble_right.png'), (700, 700))
     screen.blit(fon, (0, 0))
     if lattice_opened is True:
@@ -1118,30 +1148,36 @@ def marble_right():
                     moving = True
                 elif right_arrow.rect.collidepoint(event.pos):
                     return marble_back()
-                elif pillow_key.rect.collidepoint(event.pos) and pillow_moved:
-                    inventory.append('key')
+                elif pillow_key.rect.collidepoint(event.pos) and pillow_moved and 'key' not in marble_inventory\
+                        and not key_used:
+                    marble_inventory.append('key')
                     pillow_key.kill()
-                elif marble_right_lattice.rect.collidepoint(event.pos) and 'screwdriver' in inventory:
+                elif marble_right_lattice.rect.collidepoint(event.pos) and 'screwdriver' in marble_inventory:
                     marble_right_lattice.rect.x += 210
                     lattice_opened = True
-                    inventory.remove('screwdriver')
-                    render_inventory()
-                elif palette.rect.collidepoint(event.pos) and lattice_opened:
-                    inventory.append('palette')
+                    marble_inventory.remove('screwdriver')
+                    render_marble_inventory()
+                    screwdriver_used = True
+                elif palette.rect.collidepoint(event.pos) and lattice_opened and 'pallete' not in marble_inventory\
+                        and not palette_used:
+                    marble_inventory.append('palette')
                     palette.kill()
-                    render_inventory()
-                elif hammer.rect.collidepoint(event.pos) and lattice_opened:
-                    inventory.append('hammer')
+                    render_marble_inventory()
+                elif hammer.rect.collidepoint(event.pos) and lattice_opened and 'hammer' not in marble_inventory\
+                        and not hammer_used:
+                    marble_inventory.append('hammer')
                     hammer.kill()
-                    render_inventory()
-                elif marble_right_pot.rect.collidepoint(event.pos) and 'hammer' in inventory:
+                    render_marble_inventory()
+                elif marble_right_pot.rect.collidepoint(event.pos) and 'hammer' in marble_inventory:
                     marble_right_pot.image = load_image('broken_pot.png')
                     marble_right_pot.rect.x = 465
                     pot_broken = True
-                    inventory.remove('hammer')
-                elif pot_key.rect.collidepoint(event.pos) and pot_broken:
+                    marble_inventory.remove('hammer')
+                    hammer_used = True
+                elif pot_key.rect.collidepoint(event.pos) and pot_broken and 'pot_key' not in marble_inventory\
+                        and not pot_key_used:
                     pot_key.kill()
-                    inventory.append('pot_key')
+                    marble_inventory.append('pot_key')
             if event.type == pygame.MOUSEMOTION:
                 if moving:
                     x_new = event.rel[0]
@@ -1160,11 +1196,13 @@ def marble_right():
             pot_key_sprite.draw(screen)
         arrows_sprites.draw(screen)
         arrow_sprites.draw(screen)
-        render_inventory()
+        render_marble_inventory()
 
 
 def marble_left():
     global armchair_broken
+    global knife_used
+    global biscuit_used
     fon = pygame.transform.scale(load_image('marble_left.png'), (700, 700))
     screen.blit(fon, (0, 0))
     marble_left_sprites.draw(screen)
@@ -1180,13 +1218,15 @@ def marble_left():
                     return marble_back()
                 elif right_arrow.rect.collidepoint(event.pos):
                     return marble_front()
-                elif marble_left_armchair.rect.collidepoint(event.pos) and 'knife' in inventory:
-                    inventory.remove('knife')
+                elif marble_left_armchair.rect.collidepoint(event.pos) and 'knife' in marble_inventory:
+                    marble_inventory.remove('knife')
                     marble_left_armchair.image = load_image('broken_armchair.png')
                     marble_left_armchair.image = pygame.transform.scale(marble_left_armchair.image, (259, 308))
                     armchair_broken = True
-                elif biscuit.rect.collidepoint(event.pos) and armchair_broken:
-                    inventory.append('biscuit')
+                    knife_used = True
+                elif biscuit.rect.collidepoint(event.pos) and armchair_broken and 'biscuit' not in marble_inventory\
+                        and not biscuit_used:
+                    marble_inventory.append('biscuit')
                     biscuit.kill()
         screen.blit(fon, (0, 0))
         marble_left_sprites.draw(screen)
@@ -1194,11 +1234,13 @@ def marble_left():
         arrow_sprites.draw(screen)
         if armchair_broken:
             biscuit_sprite.draw(screen)
-        render_inventory()
+        render_marble_inventory()
 
 
 def marble_back():
     global kukushka_fed
+    global biscuit_used
+    global key_theatre_door_used
     fon = pygame.transform.scale(load_image('marble_back.png'), (700, 700))
     screen.blit(fon, (0, 0))
     marble_back_sprites.draw(screen)
@@ -1215,15 +1257,18 @@ def marble_back():
                     return marble_right()
                 elif right_arrow.rect.collidepoint(event.pos):
                     return marble_left()
-                elif marble_back_topbox.rect.collidepoint(event.pos) and 'key' in inventory:
+                elif marble_back_topbox.rect.collidepoint(event.pos) and 'key' in marble_inventory:
                     return top_box()
-                elif marble_back_bottombox.rect.collidepoint(event.pos) and 'pot_key' in inventory:
+                elif marble_back_bottombox.rect.collidepoint(event.pos) and 'pot_key' in marble_inventory:
                     return bottom_box()
-                elif kukushka.rect.collidepoint(event.pos) and 'biscuit' in inventory:
-                    inventory.remove('biscuit')
+                elif kukushka.rect.collidepoint(event.pos) and 'biscuit' in marble_inventory:
+                    marble_inventory.remove('biscuit')
                     kukushka_fed = True
-                elif kukuska_key.rect.collidepoint(event.pos) and kukushka_fed:
-                    inventory.append('key_theatre_door')
+                    biscuit_used = True
+                elif kukuska_key.rect.collidepoint(event.pos) and kukushka_fed\
+                        and 'key_theatre_door' not in marble_inventory\
+                        and not key_theatre_door_used:
+                    marble_inventory.append('key_theatre_door')
                     kukuska_key.kill()
         screen.blit(fon, (0, 0))
         marble_back_sprites.draw(screen)
@@ -1234,10 +1279,12 @@ def marble_back():
         animated_sprite.draw(screen)
         kukushka.update()
         clock.tick(10)
-        render_inventory()
+        render_marble_inventory()
 
 
 def top_box():
+    global key_used
+    global screwdriver_used
     fon = pygame.transform.scale(load_image('marble_top_box.png'), (700, 700))
     screen.blit(fon, (0, 0))
     topbox_sprites.draw(screen)
@@ -1249,20 +1296,24 @@ def top_box():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_white_arro.rect.collidepoint(event.pos):
-                    if 'screwdriver' in inventory:
-                        inventory.remove('key')
-                        render_inventory()
+                    if 'screwdriver' in marble_inventory:
+                        marble_inventory.remove('key')
+                        render_marble_inventory()
+                        key_used = True
                     return marble_back()
-                elif screwdriver.rect.collidepoint(event.pos):
-                    inventory.append('screwdriver')
+                elif screwdriver.rect.collidepoint(event.pos) and 'screwdriver' not in marble_inventory\
+                        and not screwdriver_used:
+                    marble_inventory.append('screwdriver')
                     screwdriver.kill()
         screen.blit(fon, (0, 0))
         topbox_sprites.draw(screen)
         white_arro_sprites.draw(screen)
-        render_inventory()
+        render_marble_inventory()
 
 
 def bottom_box():
+    global pot_key_used
+    global tassel_used
     fon = pygame.transform.scale(load_image('marble_bottom_box.png'), (700, 700))
     screen.blit(fon, (0, 0))
     bottombox_sprites.draw(screen)
@@ -1274,17 +1325,19 @@ def bottom_box():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_white_arro.rect.collidepoint(event.pos):
-                    if 'tassel' in inventory:
-                        inventory.remove('pot_key')
-                        render_inventory()
+                    if 'tassel' in marble_inventory:
+                        marble_inventory.remove('pot_key')
+                        render_marble_inventory()
+                        pot_key_used = True
                     return marble_back()
-                elif tassel.rect.collidepoint(event.pos):
-                    inventory.append('tassel')
+                elif tassel.rect.collidepoint(event.pos) and 'tassel' not in marble_inventory and not tassel_used:
+                    marble_inventory.append('tassel')
                     tassel.kill()
         screen.blit(fon, (0, 0))
         bottombox_sprites.draw(screen)
         white_arro_sprites.draw(screen)
-        render_inventory()
+        render_marble_inventory()
+
 
 # Театр
 def theatre_front():
@@ -1309,7 +1362,7 @@ def theatre_front():
     if fourth_code:
         inventory_sprites_code_four.draw(screen)
     while True:
-        render_inventory()
+        render_theatre_inventory()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
@@ -1320,9 +1373,9 @@ def theatre_front():
                     return theatre_right()
                 elif exit_button.rect.collidepoint(event.pos):
                     select_level()
-                elif theatre_front_door.rect.collidepoint(event.pos) and 'tragedy' in inventory\
-                        and 'comedy' in inventory and 'key_theatre_door' in inventory:
-                    inventory.clear()
+                elif theatre_front_door.rect.collidepoint(event.pos) and 'tragedy' in theatre_inventory\
+                        and 'comedy' in theatre_inventory and 'key_theatre_door' in theatre_inventory:
+                    theatre_inventory.clear()
                     theatre_end_time = time.perf_counter()
                     theatre_level_completed = True
                     theatre_final_screen()
@@ -1332,7 +1385,7 @@ def theatre_front():
                         and first_code and second_code and third_code and fourth_code:
                     return show_theatre_front_box()
                 elif theatre_front_hanger.rect.collidepoint(event.pos) and box_key_used is False \
-                        and 'key' not in inventory:
+                        and 'key' not in theatre_inventory:
                     return show_key()
         pygame.display.flip()
 
@@ -1343,7 +1396,7 @@ def show_theatre_front_box():
     show_theatre_front_box_sprites.draw(screen)
     arro_sprites.draw(screen)
     while True:
-        render_inventory()
+        render_theatre_inventory()
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1351,13 +1404,13 @@ def show_theatre_front_box():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_arrow.rect.collidepoint(event.pos):
                     return theatre_front()
-                elif tragedy.rect.collidepoint(event.pos):
+                elif tragedy.rect.collidepoint(event.pos) and 'tragedy' not in theatre_inventory:
                     tragedy.kill()
                     screen.blit(fon, (0, 0))
                     show_theatre_front_box_sprites.draw(screen)
                     arro_sprites.draw(screen)
-                    inventory.append('tragedy')
-                    render_inventory()
+                    theatre_inventory.append('tragedy')
+                    render_theatre_inventory()
 
 
 def show_key():
@@ -1369,7 +1422,7 @@ def show_key():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if key.rect.collidepoint(event.pos):
-                    inventory.append('key')
+                    theatre_inventory.append('key')
                     inventory_sprites_key.draw(screen)
                     return theatre_front()
 
@@ -1377,6 +1430,7 @@ def show_key():
 def theatre_left():
     global fertilizers_used
     global clock_arrows_set
+    global water_used
     fon = pygame.transform.scale(load_image('theatre_left.png'), (700, 700))
     screen.blit(fon, (0, 0))
     theatre_left_sprites.draw(screen)
@@ -1396,23 +1450,25 @@ def theatre_left():
                     return theatre_front()
                 elif theatre_left_box.rect.collidepoint(event.pos) and clock_arrows_set:
                     return clock_box_inside()
-                elif theatre_left_door.rect.collidepoint(event.pos) and 'door_key' in inventory:
+                elif theatre_left_door.rect.collidepoint(event.pos) and 'door_key' in theatre_inventory:
                     return box_inside()
-                elif theatre_left_clockface.rect.collidepoint(event.pos) and 'clock_arrows' in inventory:
+                elif theatre_left_clockface.rect.collidepoint(event.pos) and 'clock_arrows' in theatre_inventory:
                     clock_arrows_set = True
-                    inventory.remove('clock_arrows')
+                    theatre_inventory.remove('clock_arrows')
                     screen.fill((255, 255, 255))
                     screen.blit(fon, (0, 0))
                     theatre_left_sprites.draw(screen)
                     arrows_sprites.draw(screen)  # левая стрелка
                     arrow_sprites.draw(screen)  # правая стрелка
                     theatre_left_clock_arrows.draw(screen)
-                elif theatre_left_sprout.rect.collidepoint(event.pos) and 'fertilizers' in inventory:
-                    inventory.remove('fertilizers')
-                    render_inventory()
+                elif theatre_left_sprout.rect.collidepoint(event.pos) and 'fertilizers' in theatre_inventory:
+                    theatre_inventory.remove('fertilizers')
+                    render_theatre_inventory()
                     fertilizers_used = True
-                elif theatre_left_sprout.rect.collidepoint(event.pos) and fertilizers_used and 'water' in inventory:
-                    inventory.remove('water')
+                elif theatre_left_sprout.rect.collidepoint(event.pos) and fertilizers_used\
+                        and 'water' in theatre_inventory:
+                    theatre_inventory.remove('water')
+                    water_used = True
                     theatre_left_sprout.image = load_image('tree.png')
                     theatre_left_sprout.rect.x -= 50
                     theatre_left_sprout.rect.y -= 105
@@ -1421,9 +1477,9 @@ def theatre_left():
                     arrows_sprites.draw(screen)
                     arrow_sprites.draw(screen)
                     theatre_left_clock_arrows.draw(screen)
-                    render_inventory()
+                    render_theatre_inventory()
                     spout_grow()
-        render_inventory()
+        render_theatre_inventory()
 
 
 def spout_grow():
@@ -1445,9 +1501,9 @@ def spout_grow():
                     theatre_left_clock_arrows.draw(screen)
                     arrows_sprites.draw(screen)
                     arrow_sprites.draw(screen)
-                    inventory.append('door_key')
+                    theatre_inventory.append('door_key')
                     inventory_sprites_door_key.draw(screen)
-                    render_inventory()
+                    render_theatre_inventory()
                     actions += 1
                 elif code_three.rect.collidepoint(event.pos):
                     code_three.kill()
@@ -1458,7 +1514,7 @@ def spout_grow():
                     arrows_sprites.draw(screen)
                     arrow_sprites.draw(screen)
                     third_code = True
-                    render_inventory()
+                    render_theatre_inventory()
                     actions += 1
                 if actions == 2:
                     return theatre_left()
@@ -1466,6 +1522,8 @@ def spout_grow():
 
 def clock_box_inside():
     global second_code
+    global coin_used
+    global scrap_used
     fon = pygame.transform.scale(load_image('clock_box_inside.png'), (700, 700))
     screen.blit(fon, (0, 0))
     clock_box_inside_sprites.draw(screen)
@@ -1478,25 +1536,25 @@ def clock_box_inside():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_arrow.rect.collidepoint(event.pos):
                     return theatre_left()
-                elif coin.rect.collidepoint(event.pos):
+                elif coin.rect.collidepoint(event.pos) and 'coin' not in theatre_inventory and not coin_used:
                     coin.kill()
                     screen.blit(fon, (0, 0))
                     clock_box_inside_sprites.draw(screen)
                     arro_sprites.draw(screen)
-                    inventory.append('coin')
+                    theatre_inventory.append('coin')
                 elif code_two.rect.collidepoint(event.pos):
                     code_two.kill()
                     screen.blit(fon, (0, 0))
                     clock_box_inside_sprites.draw(screen)
                     arro_sprites.draw(screen)
                     second_code = True
-                elif scrap.rect.collidepoint(event.pos):
+                elif scrap.rect.collidepoint(event.pos) and 'scrap' not in theatre_inventory and not scrap_used:
                     scrap.kill()
                     screen.blit(fon, (0, 0))
                     clock_box_inside_sprites.draw(screen)
                     arro_sprites.draw(screen)
-                    inventory.append('scrap')
-        render_inventory()
+                    theatre_inventory.append('scrap')
+        render_theatre_inventory()
 
 
 def box_inside():
@@ -1513,8 +1571,8 @@ def box_inside():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if down_arrow.rect.collidepoint(event.pos):
                     if len(box_inside_sprites.sprites()) == 0:
-                        inventory.remove('door_key')
-                        render_inventory()
+                        theatre_inventory.remove('door_key')
+                        render_theatre_inventory()
                     return theatre_left()
                 elif code_four.rect.collidepoint(event.pos):
                     code_four.kill()
@@ -1522,23 +1580,24 @@ def box_inside():
                     box_inside_sprites.draw(screen)
                     arro_sprites.draw(screen)
                     fourth_code = True
-                elif key_theatre_door.rect.collidepoint(event.pos):
+                elif key_theatre_door.rect.collidepoint(event.pos) and 'key_theatre_door' not in theatre_inventory:
                     key_theatre_door.kill()
                     screen.blit(fon, (0, 0))
                     box_inside_sprites.draw(screen)
                     arro_sprites.draw(screen)
-                    inventory.append('key_theatre_door')
-        render_inventory()
+                    theatre_inventory.append('key_theatre_door')
+        render_theatre_inventory()
 
 
 def theatre_right():
+    global coin_used
     fon = pygame.transform.scale(load_image('theatre_right.png'), (700, 700))
     screen.blit(fon, (0, 0))
     theatre_right_sprites.draw(screen)
     arrows_sprites.draw(screen)  # левая стрелка
     arrow_sprites.draw(screen)  # правая стрелка
     while True:
-        render_inventory()
+        render_theatre_inventory()
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1548,11 +1607,12 @@ def theatre_right():
                     return theatre_front()
                 elif right_arrow.rect.collidepoint(event.pos):
                     return theatre_back()
-                elif theatre_right_box.rect.collidepoint(event.pos) and 'key' in inventory:
+                elif theatre_right_box.rect.collidepoint(event.pos) and 'key' in theatre_inventory:
                     return show_theatre_right_box()
-                elif theatre_right_crack.rect.collidepoint(event.pos) and 'coin' in inventory:
-                    inventory.remove('coin')
-                    render_inventory()
+                elif theatre_right_crack.rect.collidepoint(event.pos) and 'coin' in theatre_inventory:
+                    theatre_inventory.remove('coin')
+                    coin_used = True
+                    render_theatre_inventory()
                     show_fertilizers()
 
 
@@ -1565,7 +1625,7 @@ def show_fertilizers():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if fertilizers.rect.collidepoint(event.pos):
-                    inventory.append('fertilizers')
+                    theatre_inventory.append('fertilizers')
                     inventory_sprites_fertilizers.draw(screen)
                     return theatre_right()
 
@@ -1577,13 +1637,13 @@ def show_theatre_right_box():
     fon = pygame.transform.scale(load_image('theatre_right_box_inside.png'), (700, 700))
     screen.blit(fon, (0, 0))
     if first_code is False:
-        if 'clock_arrows' not in inventory and clock_arrows_set is False:
+        if 'clock_arrows' not in theatre_inventory and clock_arrows_set is False:
             theatre_right_box_clock_arrows.draw(screen)
             theatre_right_box_code_first.draw(screen)
         else:
             theatre_right_box_code_first.draw(screen)
     else:
-        if 'clock_arrows' not in inventory and clock_arrows_set is False:
+        if 'clock_arrows' not in theatre_inventory and clock_arrows_set is False:
             theatre_right_box_clock_arrows.draw(screen)
         else:
             pass
@@ -1595,7 +1655,7 @@ def show_theatre_right_box():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if clock_arrows.rect.collidepoint(event.pos):
-                    inventory.append('clock_arrows')
+                    theatre_inventory.append('clock_arrows')
                     inventory_sprites_clock_arrows.draw(screen)
                     if first_code:
                         screen.blit(fon, (0, 0))
@@ -1606,7 +1666,7 @@ def show_theatre_right_box():
                         arro_sprites.draw(screen)
                 elif code_first.rect.collidepoint(event.pos):
                     first_code = True
-                    if 'clock_arrows' in inventory or clock_arrows_set:
+                    if 'clock_arrows' in theatre_inventory or clock_arrows_set:
                         screen.blit(fon, (0, 0))
                         arro_sprites.draw(screen)
                     else:
@@ -1614,14 +1674,14 @@ def show_theatre_right_box():
                         theatre_right_box_clock_arrows.draw(screen)
                         arro_sprites.draw(screen)
                 elif down_arrow.rect.collidepoint(event.pos) and first_code and \
-                        ('clock_arrows' in inventory or clock_arrows_set):
-                    inventory.remove('key')
-                    render_inventory()
+                        ('clock_arrows' in theatre_inventory or clock_arrows_set):
+                    theatre_inventory.remove('key')
+                    render_theatre_inventory()
                     box_key_used = True
                     return theatre_right()
                 elif down_arrow.rect.collidepoint(event.pos):
                     return theatre_right()
-        render_inventory()
+        render_theatre_inventory()
 
 
 def theatre_back():
@@ -1642,12 +1702,13 @@ def theatre_back():
                     return theatre_left()
                 elif theatre_back_seat.rect.collidepoint(event.pos):
                     return seat()
-                elif theatre_back_scene.rect.collidepoint(event.pos) and 'scrap' in inventory:
+                elif theatre_back_scene.rect.collidepoint(event.pos) and 'scrap' in theatre_inventory:
                     return board()
-        render_inventory()
+        render_theatre_inventory()
 
 
 def seat():
+    global water_used
     fon = pygame.transform.scale(load_image('seat.png'), (700, 700))
     screen.blit(fon, (0, 0))
     seat_sprites.draw(screen)
@@ -1658,18 +1719,19 @@ def seat():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if water.rect.collidepoint(event.pos):
+                if water.rect.collidepoint(event.pos) and 'water' not in theatre_inventory and not water_used:
                     water.kill()
                     screen.blit(fon, (0, 0))
                     seat_sprites.draw(screen)
                     arro_sprites.draw(screen)
-                    inventory.append('water')
+                    theatre_inventory.append('water')
                 elif down_arrow.rect.collidepoint(event.pos):
                     return theatre_back()
-        render_inventory()
+        render_theatre_inventory()
 
 
 def board():
+    global scrap_used
     fon = pygame.transform.scale(load_image('board.png'), (700, 700))
     screen.blit(fon, (0, 0))
     board_sprites.draw(screen)
@@ -1685,10 +1747,10 @@ def board():
                     screen.blit(fon, (0, 0))
                     board_sprites.draw(screen)
                     arro_sprites.draw(screen)
-                    inventory.append('comedy')
-                elif down_arrow.rect.collidepoint(event.pos) and 'comedy' in inventory:
-                    inventory.remove('scrap')
-                    screen.fill((255, 255, 255))
+                    theatre_inventory.append('comedy')
+                elif down_arrow.rect.collidepoint(event.pos) and 'comedy' in theatre_inventory:
+                    theatre_inventory.remove('scrap')
+                    scrap_used = True
                     screen.blit(fon, (0, 0))
                     arrows_sprites.draw(screen)  # левая стрелка
                     arrow_sprites.draw(screen)  # правая стрелка
@@ -1696,7 +1758,7 @@ def board():
                     return theatre_back()
                 elif down_arrow.rect.collidepoint(event.pos):
                     return theatre_back()
-        render_inventory()
+        render_theatre_inventory()
 
 
 if __name__ == '__main__':
