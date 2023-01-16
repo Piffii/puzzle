@@ -7,7 +7,7 @@ pygame.init()
 FPS = 480
 size = WIDTH, HEIGHT = 700, 900
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption('Мистер Банеееейн, Mr. Bannaaaame')
+pygame.display.set_caption('Мистер Банеееейн')
 clock = pygame.time.Clock()
 theatre_inventory = []
 marble_inventory = []
@@ -824,6 +824,7 @@ def theatre_final_screen():
         for i in file_read.readlines():
             if str(res_time_sec) == i.rstrip('\n'):
                 position = count
+                break
             else:
                 count += 1
         file_read.close()
@@ -857,10 +858,9 @@ def theatre_save_time(time):
     with open('scores_theatre.txt', encoding='utf8', mode='rt') as file_read:
         theatre_results = list(map(int, file_read.readlines()))
         file_read.close()
-    theatre_results.sort()
     theatre_results = list(set(theatre_results))
     with open('scores_theatre.txt', encoding='utf8', mode='wt') as file_write:
-        for i in theatre_results:
+        for i in sorted(theatre_results):
             file_write.write(f'{i}\n')
         file_write.close()
 
@@ -912,11 +912,12 @@ def marble_final_screen():
     number_y = HEIGHT // 1.75 - number.get_height() // 2
     screen.blit(number, (number_x, number_y))
     with open('scores_marble.txt', encoding='utf8', mode='rt') as file_read:
-        position = 0
+        position = 1
         count = 1
         for i in file_read.readlines():
             if str(res_time_sec) == i.rstrip('\n'):
                 position = count
+                break
             else:
                 count += 1
         file_read.close()
@@ -950,10 +951,9 @@ def marble_save_time(time):
     with open('scores_marble.txt', encoding='utf8', mode='rt') as file_read:
         marble_results = list(map(int, file_read.readlines()))
         file_read.close()
-    marble_results.sort()
     marble_results = list(set(marble_results))
     with open('scores_marble.txt', encoding='utf8', mode='wt') as file_write:
-        for i in marble_results:
+        for i in sorted(marble_results):
             file_write.write(f'{i}\n')
         file_write.close()
 
@@ -1006,11 +1006,12 @@ def final_screen():
     number_y = HEIGHT // 1.6 - number.get_height() // 2
     screen.blit(number, (number_x, number_y))
     with open('scores.txt', encoding='utf8', mode='rt') as file_read:
-        position = 0
+        position = 1
         count = 1
         for i in file_read.readlines():
             if str(res_time_sec) == i.rstrip('\n'):
                 position = count
+                break
             else:
                 count += 1
         file_read.close()
@@ -1040,10 +1041,9 @@ def save_time(time):
     with open('scores.txt', encoding='utf8', mode='rt') as file_read:
         results = list(map(int, file_read.readlines()))
         file_read.close()
-    results.sort()
     results = list(set(results))
     with open('scores.txt', encoding='utf8', mode='wt') as file_write:
-        for i in results:
+        for i in sorted(results):
             file_write.write(f'{i}\n')
         file_write.close()
 
